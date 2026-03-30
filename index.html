@@ -621,49 +621,59 @@
       <!-- Plan -->
       <div class="tab-content" id="tab-plan">
         <div class="plan-item">
-          <div class="plan-date">31 MAR</div>
+          <div class="plan-date">30 MAR</div>
           <div class="plan-desc"><span class="plan-ticker">PAMP</span> · Comprar ~27 acciones en IOL con $133.000</div>
-          <span class="badge bb">pendiente</span>
+          <span class="badge br">HOY</span>
         </div>
         <div class="plan-item">
-          <div class="plan-date">31 MAR</div>
+          <div class="plan-date">30 MAR</div>
           <div class="plan-desc"><span class="plan-ticker">TZXD7</span> · Comprar CER 2027 en IOL con $50.000</div>
-          <span class="badge bb">pendiente</span>
+          <span class="badge br">HOY</span>
         </div>
         <div class="plan-item">
-          <div class="plan-date">31 MAR</div>
-          <div class="plan-desc"><span class="plan-ticker">BTC</span> · Comprar $60.000 ARS en Binance</div>
-          <span class="badge bb">pendiente</span>
+          <div class="plan-date">30 MAR</div>
+          <div class="plan-desc"><span class="plan-ticker">BTC</span> · Comprar $60.000 ARS en Binance — promedio a ~USD 80.000</div>
+          <span class="badge br">HOY</span>
         </div>
         <div class="plan-item">
           <div class="plan-date">1 ABR</div>
-          <div class="plan-desc"><span class="plan-ticker">SPY</span> · Vender 4 CEDEARs IOL → comprar en Tastytrade</div>
+          <div class="plan-desc"><span class="plan-ticker">SPY</span> · Vender 4 CEDEARs IOL → comprar fraccionario en Tastytrade</div>
           <span class="badge ba">mañana</span>
         </div>
         <div class="plan-item">
           <div class="plan-date">1 ABR</div>
-          <div class="plan-desc"><span class="plan-ticker">VWO / EWZ / GLD</span> · Comprar fraccionario en Tastytrade</div>
+          <div class="plan-desc"><span class="plan-ticker">VWO / EWZ / GLD</span> · Primeras compras fraccionarias en Tastytrade (~USD 110)</div>
           <span class="badge ba">mañana</span>
         </div>
         <div class="plan-item">
-          <div class="plan-date">28 ABR</div>
-          <div class="plan-desc"><span class="plan-ticker">VIST</span> · Evaluar posición post earnings</div>
+          <div class="plan-date">1 ABR</div>
+          <div class="plan-desc"><span class="plan-ticker">MELI</span> · Comprar fraccionario en Tastytrade — mínimo 52 semanas USD 1.631</div>
+          <span class="badge ba">mañana</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">29 ABR</div>
+          <div class="plan-desc"><span class="plan-ticker">VIST</span> · Earnings Q1 2026 — evaluar reentrada (vendida +35%)</div>
           <span class="badge bn">futuro</span>
         </div>
         <div class="plan-item">
           <div class="plan-date">8 MAY</div>
-          <div class="plan-desc"><span class="plan-ticker">YPFD</span> · Earnings — evaluar reentrada</div>
+          <div class="plan-desc"><span class="plan-ticker">YPFD</span> · Earnings Q1 2026 — evaluar reentrada USD 40-42 via Tastytrade</div>
           <span class="badge bn">futuro</span>
         </div>
         <div class="plan-item">
           <div class="plan-date">13 MAY</div>
-          <div class="plan-desc"><span class="plan-ticker">PAMP</span> · Earnings Q1 2026</div>
+          <div class="plan-desc"><span class="plan-ticker">PAMP</span> · Earnings Q1 2026 — objetivo USD 110 (+30% upside)</div>
           <span class="badge bn">futuro</span>
         </div>
         <div class="plan-item">
           <div class="plan-date">20 MAY</div>
-          <div class="plan-desc"><span class="plan-ticker">NVDA</span> · Earnings — evaluar migrar a Tastytrade</div>
+          <div class="plan-desc"><span class="plan-ticker">NVDA</span> · Earnings Q1 2026 — evaluar migrar CEDEARs a Tastytrade</div>
           <span class="badge bn">futuro</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">SIN FECHA</div>
+          <div class="plan-desc"><span class="plan-ticker">GOOGL</span> · Esperar rebote a $8.500-8.800 ARS para vender 50% y rotar a Tasty</div>
+          <span class="badge bn">watchlist</span>
         </div>
       </div>
     </div>
@@ -719,31 +729,31 @@ function toggleConfig() {
 }
 
 // ── FALLBACK DATA (posiciones hardcodeadas) ──────────────────
-const FALLBACK_IOL = [
+const FALLBACK_IOL_DEF = [
   { ticker:'TZXO6', nombre:'BONCER Oct 2026',         cantidad:73357,  precio_entrada:148.50,   grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
   { ticker:'TZX26', nombre:'BONCER Jun 2026',          cantidad:5619,   precio_entrada:352.45,   grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
+  { ticker:'TZXD7', nombre:'BONCER Dic 2027',          cantidad:0,      precio_entrada:0,        grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'comprar hoy' },
   { ticker:'AL30',  nombre:'Bono Rep. Argentina USD',  cantidad:228,    precio_entrada:88003.16, grupo:'al30',   yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
-  { ticker:'SPY',   nombre:'CEDEAR S&P 500',           cantidad:4,      precio_entrada:51693.75, grupo:'tech',   yahoo_symbol:'SPY',   ratio:0.1,        accion:'sell',  label:'vender → Tasty' },
-  { ticker:'NVDA',  nombre:'CEDEAR Nvidia',            cantidad:10,     precio_entrada:11383,    grupo:'tech',   yahoo_symbol:'NVDA',  ratio:0.04166667, accion:'wait',  label:'esperar earnings' },
+  { ticker:'SPY',   nombre:'CEDEAR S&P 500',           cantidad:4,      precio_entrada:51693.75, grupo:'tech',   yahoo_symbol:'SPY',   ratio:0.1,        accion:'sell',  label:'vender → Tasty 1/4' },
+  { ticker:'NVDA',  nombre:'CEDEAR Nvidia',            cantidad:10,     precio_entrada:11383,    grupo:'tech',   yahoo_symbol:'NVDA',  ratio:0.04166667, accion:'wait',  label:'esperar earnings 20/5' },
   { ticker:'GOOGL', nombre:'CEDEAR Alphabet',          cantidad:11,     precio_entrada:8848.64,  grupo:'tech',   yahoo_symbol:'GOOGL', ratio:1,          accion:'wait',  label:'esperar rebote' },
   { ticker:'XLE',   nombre:'CEDEAR Energy Select',     cantidad:2,      precio_entrada:42000,    grupo:'energy', yahoo_symbol:'XLE',   ratio:0.5,        accion:'hold',  label:'mantener' },
+  { ticker:'PAMP',  nombre:'Pampa Energía',            cantidad:27,     precio_entrada:4940,     grupo:'energy', yahoo_symbol:'PAM',   ratio:1,          accion:'hold',  label:'hold (earnings 13/5)' },
   { ticker:'GGAL',  nombre:'Grupo Financiero Galicia', cantidad:1,      precio_entrada:6085,     grupo:'ar',     yahoo_symbol:'GGAL',  ratio:1,          accion:'hold',  label:'mantener' },
-  { ticker:'PAMP',  nombre:'Pampa Energía',            cantidad:27,     precio_entrada:0,        grupo:'energy', yahoo_symbol:'PAM',   ratio:1,          accion:'hold',  label:'hold (earnings 13/5)' },
-  { ticker:'TZXD7', nombre:'BONCER Dic 2027',          cantidad:0,      precio_entrada:0,        grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
 ];
 
-const FALLBACK_TASTY = [
-  { ticker:'SPY',   nombre:'SPDR S&P 500 ETF',        cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
-  { ticker:'VWO',   nombre:'ETF Mercados Emergentes',  cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
-  { ticker:'EWZ',   nombre:'ETF Brasil',               cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
-  { ticker:'GLD',   nombre:'SPDR Gold Shares',         cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
-  { ticker:'NVDA',  nombre:'Nvidia Corporation',       cantidad:0, precio_entrada_usd:0, accion:'migrar desde IOL' },
-  { ticker:'GOOGL', nombre:'Alphabet Inc.',            cantidad:0, precio_entrada_usd:0, accion:'migrar desde IOL' },
-  { ticker:'MELI',  nombre:'MercadoLibre',             cantidad:0, precio_entrada_usd:0, accion:'fraccionario' },
+const FALLBACK_TASTY_DEF = [
+  { ticker:'SPY',   nombre:'SPDR S&P 500 ETF',        cantidad:0, precio_entrada_usd:0, yahoo_symbol:'SPY',   accion:'comprar 1 abril' },
+  { ticker:'VWO',   nombre:'ETF Mercados Emergentes',  cantidad:0, precio_entrada_usd:0, yahoo_symbol:'VWO',   accion:'comprar 1 abril' },
+  { ticker:'EWZ',   nombre:'ETF Brasil',               cantidad:0, precio_entrada_usd:0, yahoo_symbol:'EWZ',   accion:'comprar 1 abril' },
+  { ticker:'GLD',   nombre:'SPDR Gold Shares',         cantidad:0, precio_entrada_usd:0, yahoo_symbol:'GLD',   accion:'comprar 1 abril' },
+  { ticker:'NVDA',  nombre:'Nvidia Corporation',       cantidad:0, precio_entrada_usd:0, yahoo_symbol:'NVDA',  accion:'migrar desde IOL' },
+  { ticker:'GOOGL', nombre:'Alphabet Inc.',            cantidad:0, precio_entrada_usd:0, yahoo_symbol:'GOOGL', accion:'migrar desde IOL' },
+  { ticker:'MELI',  nombre:'MercadoLibre',             cantidad:0, precio_entrada_usd:0, yahoo_symbol:'MELI',  accion:'fraccionario' },
 ];
 
-const FALLBACK_CRYPTO = [
-  { ticker:'BTC', nombre:'Bitcoin', cantidad:0.001002, precio_entrada_usd:80000, plataforma:'Binance' },
+const FALLBACK_CRYPTO_DEF = [
+  { ticker:'BTC', nombre:'Bitcoin', cantidad:0.001002, precio_entrada_usd:80000, plataforma:'Binance', yahoo_symbol:'BTC-USD' },
 ];
 
 const STATIC_ARS = { TZXO6:148.80, TZX26:364.35, AL30:85860 };
@@ -753,8 +763,12 @@ const GROUP_LABELS = { tech:'CEDEARs tech', energy:'Energía / LATAM', al30:'Bon
 
 let pricesUSD = {};
 let donutChart = null;
-let iolData = [], tastyData = [], cryptoData = [];
 let MEP = 1422;
+
+// Inicializamos con fallback inmediatamente — se overridea si hay Sheet conectada
+let iolData = [...FALLBACK_IOL_DEF];
+let tastyData = [...FALLBACK_TASTY_DEF];
+let cryptoData = [...FALLBACK_CRYPTO_DEF];
 
 // ── FETCH PRICE ──────────────────────────────────────────────
 async function fetchPrice(symbol) {
@@ -924,14 +938,15 @@ function renderCrypto() {
   tbody.innerHTML = cryptoData.map(p => {
     const qty = parseFloat(p.cantidad) || 0;
     const cost = parseFloat(p.precio_entrada_usd) || 0;
-    const price = p.ticker === 'BTC' && pricesUSD['BTC-USD'] ? pricesUSD['BTC-USD'] : null;
+    const sym = p.yahoo_symbol || '';
+    const price = sym && pricesUSD[sym] ? pricesUSD[sym] : null;
     const val = price ? price * qty : cost * qty;
     totalUSD += val;
 
     const pct = (price && cost) ? ((price - cost) / cost) * 100 : null;
     const pctHtml = pct !== null
       ? `<span class="badge ${pct >= 0 ? 'bg' : 'br'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}%</span>`
-      : `<span class="badge bn">—</span>`;
+      : `<span class="badge bn">sin precio live</span>`;
 
     return `<tr>
       <td><div class="ticker">${p.ticker}</div><div class="ticker-name">${p.nombre}</div></td>
@@ -947,12 +962,16 @@ function renderCrypto() {
 
   const btcPos = cryptoData.find(p => p.ticker === 'BTC');
   if (btcPos) {
-    const price = pricesUSD['BTC-USD'];
+    const sym = btcPos.yahoo_symbol || 'BTC-USD';
+    const price = pricesUSD[sym];
     const cost = parseFloat(btcPos.precio_entrada_usd) || 0;
     if (price && cost) {
       const pct = ((price - cost) / cost) * 100;
       document.getElementById('kpi-btc-pnl').innerHTML =
         `<span class="${pct >= 0 ? 'up' : 'down'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}% vs entrada</span>`;
+    } else if (cost) {
+      document.getElementById('kpi-btc-pnl').innerHTML =
+        `<span class="neutral">Entrada: USD ${fmt(cost, 0)}</span>`;
     }
   }
 }
@@ -976,7 +995,12 @@ async function loadAll() {
   MEP = cfg.mep || 1422;
   document.getElementById('kpi-mep').textContent = '$' + fmt(MEP);
 
-  // Fetch Sheet si hay URL configurada
+  // Siempre arrancar con fallback
+  iolData = [...FALLBACK_IOL_DEF];
+  tastyData = [...FALLBACK_TASTY_DEF];
+  cryptoData = [...FALLBACK_CRYPTO_DEF];
+
+  // Override con Sheet si hay URL configurada
   if (cfg.sheetUrl) {
     const sheetData = await fetchSheet(cfg.sheetUrl);
     if (sheetData) {
@@ -987,15 +1011,11 @@ async function loadAll() {
     }
   }
 
-  // Usar fallback si no hay Sheet
-  if (!iolData.length) iolData = FALLBACK_IOL;
-  if (!tastyData.length) tastyData = FALLBACK_TASTY;
-  if (!cryptoData.length) cryptoData = FALLBACK_CRYPTO;
-
   // Fetch precios en vivo
   const iolSymbols = [...new Set(iolData.filter(p => p.yahoo_symbol).map(p => p.yahoo_symbol))];
   const tastySymbols = [...new Set(tastyData.filter(p => p.yahoo_symbol).map(p => p.yahoo_symbol))];
-  const allSymbols = [...new Set([...iolSymbols, ...tastySymbols, 'BTC-USD'])];
+  const cryptoSymbols = [...new Set(cryptoData.filter(p => p.yahoo_symbol).map(p => p.yahoo_symbol))];
+  const allSymbols = [...new Set([...iolSymbols, ...tastySymbols, ...cryptoSymbols])];
 
   const results = await Promise.all(allSymbols.map(s => fetchPrice(s).then(p => ({s, p}))));
   results.forEach(({s, p}) => { if (p) pricesUSD[s] = p; });
