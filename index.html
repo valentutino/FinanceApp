@@ -4,950 +4,150 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portfolio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.23.5/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:       #080b10;
-      --bg2:      #0d1117;
-      --bg3:      #111820;
-      --bg4:      #161e28;
-      --border:   rgba(255,255,255,0.07);
-      --border2:  rgba(255,255,255,0.12);
-      --text:     #f0f4f8;
-      --text2:    #8b95a1;
-      --text3:    #4a5568;
-      --green:    #00d68f;
-      --green2:   #00b377;
-      --green-bg: rgba(0,214,143,0.08);
-      --red:      #ff4d6a;
-      --red-bg:   rgba(255,77,106,0.08);
-      --amber:    #ffb020;
-      --amber-bg: rgba(255,176,32,0.08);
-      --blue:     #4d9fff;
-      --blue-bg:  rgba(77,159,255,0.08);
-      --purple:   #a78bfa;
-      --purple-bg:rgba(167,139,250,0.08);
-      --gold:     #f59e0b;
-      --gold-bg:  rgba(245,158,11,0.08);
-      --cyan:     #22d3ee;
-      --cyan-bg:  rgba(34,211,238,0.08);
-      --font:     'Syne', sans-serif;
-      --mono:     'JetBrains Mono', monospace;
-      --radius:   12px;
-      --radius-lg:18px;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Background grain ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-      opacity: .4;
-    }
-
-    /* ── Layout ── */
-    .layout {
-      display: grid;
-      grid-template-columns: 72px 1fr;
-      min-height: 100vh;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 0;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      gap: 4px;
-    }
-
-    .logo {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, var(--green), var(--cyan));
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      margin-bottom: 24px;
-      box-shadow: 0 0 20px rgba(0,214,143,0.3);
-    }
-
-    .nav-icon {
-      width: 44px; height: 44px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 18px;
-      color: var(--text3);
-      transition: all .2s;
-      border: 1px solid transparent;
-    }
-
-    .nav-icon:hover { background: var(--bg3); color: var(--text2); }
-    .nav-icon.active { background: var(--green-bg); color: var(--green); border-color: rgba(0,214,143,0.2); }
-
-    .sidebar-spacer { flex: 1; }
-
-    /* ── Main ── */
-    .main {
-      padding: 32px 36px;
-      max-width: 1400px;
-    }
-
-    /* ── Header ── */
-    .header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 36px;
-      animation: fadeUp .5s ease both;
-    }
-
-    .header-title {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      background: linear-gradient(135deg, var(--text) 0%, var(--text2) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header-sub {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pulse-dot {
-      width: 7px; height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-      box-shadow: 0 0 8px var(--green);
-    }
-
-    .live-label {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--green);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: 9px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid var(--border2);
-      background: var(--bg3);
-      color: var(--text2);
-      font-family: var(--font);
-      transition: all .2s;
-      letter-spacing: 0.3px;
-    }
-
-    .btn:hover { border-color: var(--border2); color: var(--text); background: var(--bg4); transform: translateY(-1px); }
-    .btn-green { background: var(--green); color: #000; border-color: var(--green); font-weight: 700; }
-    .btn-green:hover { background: var(--green2); border-color: var(--green2); color: #000; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,214,143,0.3); }
-    .btn.spin-active { opacity: .6; pointer-events: none; }
-
-    /* ── KPI Grid ── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-      margin-bottom: 28px;
-      animation: fadeUp .5s .1s ease both;
-    }
-
-    .kpi {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 20px 22px;
-      cursor: default;
-      transition: all .25s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .kpi::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      opacity: 0;
-      transition: opacity .3s;
-    }
-
-    .kpi:hover { border-color: var(--border2); transform: translateY(-2px); }
-    .kpi:hover::after { opacity: 1; }
-    .kpi.g::after { background: linear-gradient(90deg, var(--green), var(--cyan)); }
-    .kpi.b::after { background: linear-gradient(90deg, var(--blue), var(--purple)); }
-    .kpi.go::after { background: linear-gradient(90deg, var(--gold), var(--amber)); }
-    .kpi.a::after { background: linear-gradient(90deg, var(--amber), var(--red)); }
-    .kpi.p::after { background: linear-gradient(90deg, var(--purple), var(--blue)); }
-
-    .kpi-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    .kpi-val {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      color: var(--text);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .kpi-sub {
-      font-family: var(--mono);
-      font-size: 11px;
-    }
-
-    .up   { color: var(--green); }
-    .down { color: var(--red); }
-    .flat { color: var(--text3); }
-
-    /* ── Content grid ── */
-    .content-grid {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 16px;
-      animation: fadeUp .5s .2s ease both;
-    }
-
-    /* ── Card ── */
-    .card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
-    .card-head {
-      padding: 18px 22px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .card-desc {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      margin-top: 2px;
-    }
-
-    /* ── Tabs ── */
-    .tabs {
-      display: flex;
-      gap: 2px;
-      background: var(--bg);
-      padding: 4px;
-      border-radius: 10px;
-    }
-
-    .tab {
-      padding: 5px 12px;
-      border-radius: 7px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--text3);
-      font-family: var(--font);
-      transition: all .15s;
-      letter-spacing: 0.2px;
-    }
-
-    .tab:hover { color: var(--text2); }
-    .tab.active { background: var(--bg3); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
-
-    /* ── Table ── */
-    table { width: 100%; border-collapse: collapse; }
-
-    th {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 10px 22px;
-      text-align: right;
-      background: rgba(255,255,255,0.02);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    th:first-child { text-align: left; }
-
-    td {
-      padding: 12px 22px;
-      font-size: 13px;
-      text-align: right;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      transition: background .15s;
-    }
-
-    td:first-child { text-align: left; }
-    tr:last-child td { border-bottom: none; }
-
-    tr:hover td {
-      background: rgba(255,255,255,0.025);
-    }
-
-    .section-sep td {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      background: rgba(255,255,255,0.015);
-      padding: 7px 22px;
-      border-top: 1px solid var(--border);
-    }
-
-    .ticker {
-      font-family: var(--mono);
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text);
-      letter-spacing: 0.5px;
-    }
-
-    .ticker-sub {
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 2px;
-      font-family: var(--mono);
-    }
-
-    .mono { font-family: var(--mono); }
-
-    /* ── Badges ── */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-      font-family: var(--mono);
-    }
-
-    .bg { background: var(--green-bg); color: var(--green); }
-    .br { background: var(--red-bg);   color: var(--red); }
-    .ba { background: var(--amber-bg); color: var(--amber); }
-    .bb { background: var(--blue-bg);  color: var(--blue); }
-    .bp { background: var(--purple-bg);color: var(--purple); }
-    .bc { background: var(--cyan-bg);  color: var(--cyan); }
-    .bn { background: rgba(255,255,255,0.05); color: var(--text3); }
-
-    /* ── Donut ── */
-    .donut-wrap { padding: 20px 22px; }
-    .donut-canvas-wrap {
-      position: relative;
-      width: 150px;
-      height: 150px;
-      margin: 12px auto 20px;
-    }
-    .donut-center {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      text-align: center;
-      pointer-events: none;
-    }
-    .donut-center-val {
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.2;
-    }
-    .donut-center-lbl {
-      font-family: var(--mono);
-      font-size: 9px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-
-    .alloc-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .alloc-item:last-child { border-bottom: none; }
-    .alloc-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .alloc-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .alloc-name { font-size: 12px; color: var(--text2); }
-    .alloc-bar-wrap {
-      flex: 1;
-      margin: 0 12px;
-      height: 3px;
-      background: var(--bg3);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .alloc-bar {
-      height: 100%;
-      border-radius: 2px;
-      transition: width .8s cubic-bezier(.4,0,.2,1);
-    }
-    .alloc-pct {
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      min-width: 32px;
-      text-align: right;
-    }
-
-    /* ── Plan items ── */
-    .plan-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 22px;
-      border-bottom: 1px solid var(--border);
-      transition: background .15s;
-    }
-    .plan-item:last-child { border-bottom: none; }
-    .plan-item:hover { background: rgba(255,255,255,0.02); }
-
-    .plan-date {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text3);
-      min-width: 52px;
-      letter-spacing: .5px;
-    }
-
-    .plan-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .plan-desc { flex: 1; font-size: 12px; color: var(--text2); }
-    .plan-ticker-name { font-weight: 700; color: var(--text); font-family: var(--mono); margin-right: 4px; }
-
-    /* ── Config panel ── */
-    .cfg-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-    }
-    .cfg-overlay.open { display: flex; align-items: flex-start; justify-content: flex-end; }
-
-    .cfg-panel {
-      width: 380px;
-      height: 100vh;
-      background: var(--bg2);
-      border-left: 1px solid var(--border2);
-      padding: 28px;
-      overflow-y: auto;
-      animation: slideIn .25s ease;
-    }
-
-    @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-    .cfg-title { font-size: 17px; font-weight: 800; margin-bottom: 24px; letter-spacing: -0.5px; }
-    .cfg-lbl {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-    .cfg-input {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      font-size: 12px;
-      font-family: var(--mono);
-      color: var(--text);
-      background: var(--bg3);
-      margin-bottom: 20px;
-      outline: none;
-      transition: border-color .2s;
-    }
-    .cfg-input:focus { border-color: var(--green); background: var(--bg4); }
-    .cfg-hint { font-size: 11px; color: var(--text3); margin-top: -14px; margin-bottom: 20px; line-height: 1.6; }
-
-    .cfg-steps {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      margin-top: 20px;
-    }
-    .cfg-step {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 10px;
-      font-size: 11px;
-      color: var(--text2);
-      line-height: 1.5;
-    }
-    .cfg-step:last-child { margin-bottom: 0; }
-    .cfg-step-n {
-      width: 18px; height: 18px;
-      background: var(--bg4);
-      border: 1px solid var(--border2);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--mono);
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--text3);
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    /* ── Tab content ── */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* ── Animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
-      50%       { opacity: .5; box-shadow: 0 0 4px var(--green); }
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinning { animation: spin .7s linear infinite; display: inline-block; }
-
-    /* ── Number counter animation ── */
-    .count-up { transition: all .3s; }
-
-    /* ── Empty state ── */
-    .empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text3);
-    }
-    .empty-icon { font-size: 32px; margin-bottom: 10px; }
-    .empty-text { font-size: 13px; line-height: 1.6; }
-
-    /* ── Responsive ── */
-    @media (max-width: 1100px) {
-      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-      .content-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 700px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-      .main { padding: 16px; }
-      .kpi-grid { grid-template-columns: 1fr 1fr; }
-      .hide-sm { display: none; }
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0F111A; font-family: 'Geist', sans-serif; color: #e2e8f0; -webkit-font-smoothing: antialiased; }
+    .mono { font-family: 'Geist Mono', monospace; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 2px; }
+    .recharts-surface { overflow: visible; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes shimmer { 0%,100% { opacity:.4; } 50% { opacity:1; } }
+    .fade-up { animation: fadeUp .4s ease both; }
+    .fade-up-1 { animation: fadeUp .4s .08s ease both; }
+    .fade-up-2 { animation: fadeUp .4s .16s ease both; }
+    .fade-up-3 { animation: fadeUp .4s .24s ease both; }
+    .fade-up-4 { animation: fadeUp .4s .32s ease both; }
+    .fade-up-5 { animation: fadeUp .4s .40s ease both; }
+    .loading-pulse { animation: shimmer 1.4s ease infinite; }
+    .bento-card { background: #161B22; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; transition: border-color .2s; }
+    .bento-card:hover { border-color: rgba(255,255,255,0.1); }
+    .positive { color: #10b981; }
+    .negative { color: #f87171; }
+    .neutral  { color: #94a3b8; }
+    .pill-active { background: rgba(99,102,241,0.2); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+    .pill-inactive { background: transparent; color: #64748b; border: 1px solid transparent; }
+    .pill-inactive:hover { color: #94a3b8; background: rgba(255,255,255,0.04); }
+    .row-hover { transition: background .15s; }
+    .row-hover:hover { background: rgba(255,255,255,0.03); }
   </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            base: '#0F111A',
+            card: '#161B22',
+            card2: '#1a2030',
+          }
+        }
+      }
+    }
+  </script>
 </head>
 <body>
+<div id="root"></div>
 
-<div class="layout">
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+const {
+  AreaChart, Area, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid
+} = Recharts;
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">📈</div>
-    <div class="nav-icon active" title="Dashboard">⬛</div>
-    <div class="nav-icon" title="IOL">🇦🇷</div>
-    <div class="nav-icon" title="Tasty">🇺🇸</div>
-    <div class="nav-icon" title="Crypto">₿</div>
-    <div class="sidebar-spacer"></div>
-    <div class="nav-icon" title="Config" onclick="toggleCfg()">⚙</div>
-  </aside>
+// ═══════════════════════════════════════════
+// DATA LAYER
+// ═══════════════════════════════════════════
 
-  <!-- Main -->
-  <main class="main">
+const MEP = 1422;
 
-    <!-- Header -->
-    <div class="header">
-      <div>
-        <div class="header-title">Mi Portafolio</div>
-        <div class="header-sub" id="last-update">inicializando...</div>
-      </div>
-      <div class="header-actions">
-        <div class="live-label">
-          <div class="pulse-dot"></div>
-          en vivo
-        </div>
-        <button class="btn" onclick="toggleCfg()">⚙ Google Sheet</button>
-        <button class="btn btn-green" id="refresh-btn" onclick="loadAll()">
-          <span id="refresh-icon">↻</span> Actualizar
-        </button>
-      </div>
-    </div>
-
-    <!-- KPIs -->
-    <div class="kpi-grid">
-      <div class="kpi g">
-        <div class="kpi-label">Total IOL · ARS</div>
-        <div class="kpi-val" id="kpi-iol">—</div>
-        <div class="kpi-sub" id="kpi-iol-pnl"><span class="flat">calculando</span></div>
-      </div>
-      <div class="kpi b">
-        <div class="kpi-label">Tastytrade · USD</div>
-        <div class="kpi-val" id="kpi-tasty">USD 0</div>
-        <div class="kpi-sub"><span class="flat">fondeo 1 abril</span></div>
-      </div>
-      <div class="kpi go">
-        <div class="kpi-label">Bitcoin · USD</div>
-        <div class="kpi-val" id="kpi-btc">—</div>
-        <div class="kpi-sub" id="kpi-btc-sub"><span class="flat">calculando</span></div>
-      </div>
-      <div class="kpi a">
-        <div class="kpi-label">Dólar MEP</div>
-        <div class="kpi-val" id="kpi-mep">$1.422</div>
-        <div class="kpi-sub"><span class="flat">referencia manual</span></div>
-      </div>
-      <div class="kpi p">
-        <div class="kpi-label">Riesgo País</div>
-        <div class="kpi-val up">595<span style="font-size:14px;font-weight:500"> pb</span></div>
-        <div class="kpi-sub up">↓ mín. reciente</div>
-      </div>
-    </div>
-
-    <!-- Content -->
-    <div class="content-grid">
-
-      <!-- Positions card -->
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Posiciones</div>
-            <div class="card-desc">precios en tiempo real · Yahoo Finance</div>
-          </div>
-          <div class="tabs">
-            <button class="tab active" onclick="showTab('iol',this)">🇦🇷 IOL</button>
-            <button class="tab" onclick="showTab('tasty',this)">🇺🇸 Tasty</button>
-            <button class="tab" onclick="showTab('crypto',this)">₿ Crypto</button>
-            <button class="tab" onclick="showTab('plan',this)">📋 Plan</button>
-          </div>
-        </div>
-
-        <!-- IOL -->
-        <div class="tab-content active" id="tab-iol">
-          <table>
-            <thead><tr>
-              <th>Activo</th>
-              <th class="hide-sm">Cant.</th>
-              <th>Precio ARS</th>
-              <th class="hide-sm">Total</th>
-              <th>P&L</th>
-              <th class="hide-sm">Estado</th>
-            </tr></thead>
-            <tbody id="iol-tbody">
-              <tr><td colspan="6">
-                <div class="empty">
-                  <div class="empty-icon">⏳</div>
-                  <div class="empty-text">Cargando precios...</div>
-                </div>
-              </td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Tasty -->
-        <div class="tab-content" id="tab-tasty">
-          <table>
-            <thead><tr>
-              <th>Activo</th>
-              <th>Descripción</th>
-              <th>Precio USD</th>
-              <th>P&L</th>
-              <th>Estado</th>
-            </tr></thead>
-            <tbody id="tasty-tbody"></tbody>
-          </table>
-        </div>
-
-        <!-- Crypto -->
-        <div class="tab-content" id="tab-crypto">
-          <table>
-            <thead><tr>
-              <th>Activo</th>
-              <th>Cantidad</th>
-              <th>Precio USD</th>
-              <th>Valor USD</th>
-              <th>P&L</th>
-              <th>Plataforma</th>
-            </tr></thead>
-            <tbody id="crypto-tbody"></tbody>
-          </table>
-        </div>
-
-        <!-- Plan -->
-        <div class="tab-content" id="tab-plan">
-          <div class="plan-item">
-            <div class="plan-date">30 MAR</div>
-            <div class="plan-dot" style="background:var(--red)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">PAMP</span> Comprar ~27 acciones IOL · $133.000 ARS</div>
-            <span class="badge br">HOY</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">30 MAR</div>
-            <div class="plan-dot" style="background:var(--red)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">TZXD7</span> Comprar BONCER Dic 2027 IOL · $50.000 ARS</div>
-            <span class="badge br">HOY</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">30 MAR</div>
-            <div class="plan-dot" style="background:var(--red)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">BTC</span> Comprar $60.000 ARS en Binance · promedio → USD 80K</div>
-            <span class="badge br">HOY</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">1 ABR</div>
-            <div class="plan-dot" style="background:var(--amber)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">SPY</span> Vender 4 CEDEARs IOL → comprar fraccionario Tastytrade</div>
-            <span class="badge ba">mañana</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">1 ABR</div>
-            <div class="plan-dot" style="background:var(--amber)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">VWO · EWZ · GLD</span> Primera compra fraccionaria Tastytrade · ~USD 110</div>
-            <span class="badge ba">mañana</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">1 ABR</div>
-            <div class="plan-dot" style="background:var(--amber)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">MELI</span> Fraccionario Tastytrade · mín 52s = USD 1.631</div>
-            <span class="badge ba">mañana</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">29 ABR</div>
-            <div class="plan-dot" style="background:var(--text3)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">VIST</span> Earnings Q1 2026 · evaluar reentrada (vendida +35%)</div>
-            <span class="badge bn">futuro</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">8 MAY</div>
-            <div class="plan-dot" style="background:var(--text3)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">YPFD</span> Earnings Q1 2026 · evaluar reentrada USD 40–42 en Tasty</div>
-            <span class="badge bn">futuro</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">13 MAY</div>
-            <div class="plan-dot" style="background:var(--text3)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">PAMP</span> Earnings Q1 2026 · objetivo precio USD 110 (+30%)</div>
-            <span class="badge bn">futuro</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">20 MAY</div>
-            <div class="plan-dot" style="background:var(--text3)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">NVDA</span> Earnings Q1 2026 · evaluar migrar CEDEARs a Tastytrade</div>
-            <span class="badge bn">futuro</span>
-          </div>
-          <div class="plan-item">
-            <div class="plan-date">—</div>
-            <div class="plan-dot" style="background:var(--text3)"></div>
-            <div class="plan-desc"><span class="plan-ticker-name">GOOGL</span> Esperar rebote $8.500–8.800 ARS · vender 50% y rotar</div>
-            <span class="badge bn">watchlist</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: donut -->
-      <div class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Distribución</div>
-            <div class="card-desc">portafolio IOL por categoría</div>
-          </div>
-        </div>
-        <div class="donut-wrap">
-          <div class="donut-canvas-wrap">
-            <canvas id="donutChart"></canvas>
-            <div class="donut-center">
-              <div class="donut-center-val" id="donut-val">—</div>
-              <div class="donut-center-lbl">total</div>
-            </div>
-          </div>
-          <div id="alloc-list"></div>
-        </div>
-      </div>
-
-    </div>
-  </main>
-</div>
-
-<!-- Config overlay -->
-<div class="cfg-overlay" id="cfg-overlay" onclick="closeCfgOverlay(event)">
-  <div class="cfg-panel" onclick="event.stopPropagation()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-      <div class="cfg-title">⚙ Configuración</div>
-      <button class="btn" onclick="toggleCfg()">✕</button>
-    </div>
-
-    <div class="cfg-lbl">URL Apps Script</div>
-    <input class="cfg-input" id="sheet-url" placeholder="https://script.google.com/macros/s/...">
-    <div class="cfg-hint">Pegá la URL de tu Apps Script deployado para sincronizar posiciones automáticamente.</div>
-
-    <div class="cfg-lbl">Dólar MEP (ARS)</div>
-    <input class="cfg-input" id="mep-rate" type="number" value="1422">
-
-    <button class="btn btn-green" style="width:100%;justify-content:center" onclick="saveCfg()">
-      💾 Guardar y recargar
-    </button>
-
-    <div class="cfg-steps" style="margin-top:24px">
-      <div class="cfg-lbl" style="margin-bottom:12px">Cómo conectar Google Sheet</div>
-      <div class="cfg-step"><div class="cfg-step-n">1</div><span>Abrí tu Google Sheet → Extensions → Apps Script</span></div>
-      <div class="cfg-step"><div class="cfg-step-n">2</div><span>Pegá el código de <code>APPS_SCRIPT.gs</code> y guardá</span></div>
-      <div class="cfg-step"><div class="cfg-step-n">3</div><span>Deploy → New deployment → Web app</span></div>
-      <div class="cfg-step"><div class="cfg-step-n">4</div><span>Execute as: <b>Me</b> · Access: <b>Anyone</b></span></div>
-      <div class="cfg-step"><div class="cfg-step-n">5</div><span>Copiá la URL y pegala arriba 👆</span></div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── CONFIG ────────────────────────────────────────────────────
-const CFG_KEY = 'pf_cfg_v2';
-function getCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch { return {}; } }
-function saveCfg() {
-  const url = document.getElementById('sheet-url').value.trim();
-  const mep = parseFloat(document.getElementById('mep-rate').value) || 1422;
-  localStorage.setItem(CFG_KEY, JSON.stringify({ url, mep }));
-  toggleCfg();
-  loadAll();
-}
-function toggleCfg() {
-  const o = document.getElementById('cfg-overlay');
-  o.classList.toggle('open');
-  const c = getCfg();
-  if (c.url) document.getElementById('sheet-url').value = c.url;
-  if (c.mep) document.getElementById('mep-rate').value = c.mep;
-}
-function closeCfgOverlay(e) {
-  if (e.target === document.getElementById('cfg-overlay')) toggleCfg();
-}
-
-// ── FALLBACK DATA ─────────────────────────────────────────────
-const IOL_FB = [
-  { ticker:'TZXO6', nombre:'BONCER Oct 2026',         qty:73357,  cost:148.50,   group:'cer',    sym:'',      ratio:1,          action:'hold', label:'mantener' },
-  { ticker:'TZX26', nombre:'BONCER Jun 2026',          qty:5619,   cost:352.45,   group:'cer',    sym:'',      ratio:1,          action:'hold', label:'mantener' },
-  { ticker:'TZXD7', nombre:'BONCER Dic 2027',          qty:0,      cost:0,        group:'cer',    sym:'',      ratio:1,          action:'hold', label:'comprar hoy' },
-  { ticker:'AL30',  nombre:'Bono Rep. Argentina USD',  qty:228,    cost:88003.16, group:'al30',   sym:'',      ratio:1,          action:'hold', label:'mantener' },
-  { ticker:'SPY',   nombre:'CEDEAR S&P 500',           qty:4,      cost:51693.75, group:'tech',   sym:'SPY',   ratio:0.1,        action:'sell', label:'vender → Tasty 1/4' },
-  { ticker:'NVDA',  nombre:'CEDEAR Nvidia',            qty:10,     cost:11383,    group:'tech',   sym:'NVDA',  ratio:0.04166667, action:'wait', label:'earnings 20/5' },
-  { ticker:'GOOGL', nombre:'CEDEAR Alphabet',          qty:11,     cost:8848.64,  group:'tech',   sym:'GOOGL', ratio:1,          action:'wait', label:'esperar rebote' },
-  { ticker:'XLE',   nombre:'CEDEAR Energy Select',     qty:2,      cost:42000,    group:'energy', sym:'XLE',   ratio:0.5,        action:'hold', label:'mantener' },
-  { ticker:'PAMP',  nombre:'Pampa Energía',            qty:27,     cost:4940,     group:'energy', sym:'PAM',   ratio:1,          action:'hold', label:'earnings 13/5' },
-  { ticker:'GGAL',  nombre:'Grupo Financiero Galicia', qty:1,      cost:6085,     group:'ar',     sym:'GGAL',  ratio:1,          action:'hold', label:'mantener' },
+const IOL_POSITIONS = [
+  { ticker:'TZXO6', name:'BONCER Oct 2026',        qty:73357,  cost:148.50,   group:'cer',    sym:'',       ratio:1,          action:'hold', label:'mantener' },
+  { ticker:'TZX26', name:'BONCER Jun 2026',         qty:5619,   cost:352.45,   group:'cer',    sym:'',       ratio:1,          action:'hold', label:'mantener' },
+  { ticker:'TZXD7', name:'BONCER Dic 2027',         qty:0,      cost:0,        group:'cer',    sym:'',       ratio:1,          action:'buy',  label:'comprar hoy' },
+  { ticker:'AL30',  name:'Bono Rep. Argentina USD', qty:228,    cost:88003.16, group:'al30',   sym:'',       ratio:1,          action:'hold', label:'mantener' },
+  { ticker:'SPY',   name:'CEDEAR S&P 500',          qty:4,      cost:51693.75, group:'tech',   sym:'SPY',    ratio:0.1,        action:'sell', label:'vender → Tasty' },
+  { ticker:'NVDA',  name:'CEDEAR Nvidia',           qty:10,     cost:11383,    group:'tech',   sym:'NVDA',   ratio:0.04166667, action:'wait', label:'earnings 20/5' },
+  { ticker:'GOOGL', name:'CEDEAR Alphabet',         qty:11,     cost:8848.64,  group:'tech',   sym:'GOOGL',  ratio:1,          action:'wait', label:'esperar rebote' },
+  { ticker:'XLE',   name:'CEDEAR Energy Select',    qty:2,      cost:42000,    group:'energy', sym:'XLE',    ratio:0.5,        action:'hold', label:'mantener' },
+  { ticker:'PAMP',  name:'Pampa Energía',           qty:27,     cost:4940,     group:'energy', sym:'PAM',    ratio:1,          action:'hold', label:'earnings 13/5' },
+  { ticker:'GGAL',  name:'Grupo Financiero Galicia',qty:1,      cost:6085,     group:'ar',     sym:'GGAL',   ratio:1,          action:'hold', label:'mantener' },
 ];
 
-const TASTY_FB = [
-  { ticker:'SPY',   nombre:'SPDR S&P 500 ETF',       qty:0, cost:0, sym:'SPY',   action:'comprar 1 abril' },
-  { ticker:'VWO',   nombre:'Vanguard Emerging Mkts',  qty:0, cost:0, sym:'VWO',   action:'comprar 1 abril' },
-  { ticker:'EWZ',   nombre:'iShares MSCI Brazil ETF', qty:0, cost:0, sym:'EWZ',   action:'comprar 1 abril' },
-  { ticker:'GLD',   nombre:'SPDR Gold Shares',        qty:0, cost:0, sym:'GLD',   action:'comprar 1 abril' },
-  { ticker:'NVDA',  nombre:'Nvidia Corporation',      qty:0, cost:0, sym:'NVDA',  action:'migrar desde IOL' },
-  { ticker:'GOOGL', nombre:'Alphabet Inc.',           qty:0, cost:0, sym:'GOOGL', action:'migrar desde IOL' },
-  { ticker:'MELI',  nombre:'MercadoLibre Inc.',       qty:0, cost:0, sym:'MELI',  action:'fraccionario' },
+const TASTY_POSITIONS = [
+  { ticker:'SPY',   name:'SPDR S&P 500 ETF',       qty:0, cost:0, sym:'SPY',   action:'comprar 1 abril' },
+  { ticker:'VWO',   name:'Vanguard Emerging Mkts',  qty:0, cost:0, sym:'VWO',   action:'comprar 1 abril' },
+  { ticker:'EWZ',   name:'iShares MSCI Brazil ETF', qty:0, cost:0, sym:'EWZ',   action:'comprar 1 abril' },
+  { ticker:'GLD',   name:'SPDR Gold Shares',        qty:0, cost:0, sym:'GLD',   action:'comprar 1 abril' },
+  { ticker:'NVDA',  name:'Nvidia Corporation',      qty:0, cost:0, sym:'NVDA',  action:'migrar desde IOL' },
+  { ticker:'GOOGL', name:'Alphabet Inc.',           qty:0, cost:0, sym:'GOOGL', action:'migrar desde IOL' },
+  { ticker:'MELI',  name:'MercadoLibre Inc.',       qty:0, cost:0, sym:'MELI',  action:'fraccionario' },
 ];
 
-const CRYPTO_FB = [
-  { ticker:'BTC', nombre:'Bitcoin', qty:0.001002, cost:80000, sym:'BTC-USD', platform:'Binance' },
+const CRYPTO_POSITIONS = [
+  { ticker:'BTC', name:'Bitcoin', qty:0.001002, cost:80000, sym:'BTC-USD', platform:'Binance' },
 ];
 
-const STATIC = { TZXO6:148.80, TZX26:364.35, AL30:85860 };
-const GRP_COLOR = { tech:'#4d9fff', energy:'#00d68f', al30:'#ffb020', cer:'#a78bfa', ar:'#22d3ee' };
-const GRP_LABEL = { tech:'CEDEARs tech', energy:'Energía / LATAM', al30:'Bonos USD', cer:'CER / Inflación', ar:'Acciones AR' };
+const STATIC_PRICES = { TZXO6:148.80, TZX26:364.35, AL30:85860 };
 
-let prices = {};
-let donutChart = null;
-let MEP = 1422;
-let iolData = [...IOL_FB], tastyData = [...TASTY_FB], cryptoData = [...CRYPTO_FB];
+const GROUP_META = {
+  tech:   { label:'CEDEARs Tech',     color:'#6366f1' },
+  energy: { label:'Energía / LATAM',  color:'#10b981' },
+  al30:   { label:'Bonos USD',        color:'#f59e0b' },
+  cer:    { label:'CER / Inflación',  color:'#a78bfa' },
+  ar:     { label:'Acciones AR',      color:'#22d3ee' },
+};
 
-// ── FETCH ─────────────────────────────────────────────────────
-async function fetchPrice(sym) {
+const PLAN_ITEMS = [
+  { date:'30 MAR', ticker:'PAMP',          desc:'Comprar ~27 acciones IOL · $133.000 ARS',              urgency:'hot' },
+  { date:'30 MAR', ticker:'TZXD7',         desc:'Comprar BONCER Dic 2027 · $50.000 ARS',                urgency:'hot' },
+  { date:'30 MAR', ticker:'BTC',           desc:'Comprar $60.000 ARS en Binance · avg → USD 80K',       urgency:'hot' },
+  { date:'1 ABR',  ticker:'SPY',           desc:'Vender 4 CEDEARs IOL → comprar fraccionario Tasty',    urgency:'warm' },
+  { date:'1 ABR',  ticker:'VWO·EWZ·GLD',  desc:'Primera compra fraccionaria Tastytrade · ~USD 110',     urgency:'warm' },
+  { date:'1 ABR',  ticker:'MELI',          desc:'Fraccionario Tastytrade · mín 52s USD 1.631',           urgency:'warm' },
+  { date:'29 ABR', ticker:'VIST',          desc:'Earnings Q1 · evaluar reentrada (vendida +35%)',        urgency:'cold' },
+  { date:'8 MAY',  ticker:'YPFD',          desc:'Earnings Q1 · evaluar reentrada USD 40-42 en Tasty',   urgency:'cold' },
+  { date:'13 MAY', ticker:'PAMP',          desc:'Earnings Q1 · objetivo USD 110 (+30% upside)',          urgency:'cold' },
+  { date:'20 MAY', ticker:'NVDA',          desc:'Earnings Q1 · evaluar migrar CEDEARs a Tastytrade',    urgency:'cold' },
+];
+
+// Generate chart data
+function genChartData(days, base, vol) {
+  const d = []; let v = base;
+  const now = new Date();
+  for (let i = days; i >= 0; i--) {
+    const dt = new Date(now); dt.setDate(dt.getDate() - i);
+    v = Math.max(v * (1 + (Math.random()-.48) * vol), base * 0.7);
+    d.push({
+      date: dt.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit' }),
+      fullDate: dt.toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' }),
+      value: Math.round(v)
+    });
+  }
+  return d;
+}
+
+const CHART_DATA = {
+  '1D':  genChartData(1,   980000, 0.008),
+  '1S':  genChartData(7,   950000, 0.012),
+  '1M':  genChartData(30,  900000, 0.018),
+  '6M':  genChartData(180, 780000, 0.022),
+  'YTD': genChartData(89,  820000, 0.020),
+  '1A':  genChartData(365, 650000, 0.025),
+};
+
+// ═══════════════════════════════════════════
+// PRICE FETCHING
+// ═══════════════════════════════════════════
+
+async function fetchLivePrice(sym) {
   const urls = [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`)}`,
     `https://corsproxy.io/?${encodeURIComponent(`https://query2.finance.yahoo.com/v8/finance/chart/${sym}`)}`,
@@ -963,261 +163,620 @@ async function fetchPrice(sym) {
   return null;
 }
 
-async function fetchSheet(url) {
-  try {
-    const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    return await r.json();
-  } catch { return null; }
-}
-
-// ── HELPERS ───────────────────────────────────────────────────
-function priceARS(p) {
-  if (STATIC[p.ticker]) return STATIC[p.ticker];
-  const s = p.sym || p.yahoo_symbol || '';
-  if (s && prices[s]) return prices[s] * (parseFloat(p.ratio)||1) * MEP;
-  return null;
-}
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
 
 function n(v, d=0) {
   if (v == null || isNaN(v)) return '—';
   return v.toLocaleString('es-AR', { minimumFractionDigits:d, maximumFractionDigits:d });
 }
 
-// ── RENDER IOL ────────────────────────────────────────────────
-function renderIOL() {
-  const tbody = document.getElementById('iol-tbody');
-  const groups = [
-    { k:'cer',    l:'Bonos CER — cobertura inflación' },
-    { k:'al30',   l:'Bono USD soberano' },
-    { k:'tech',   l:'CEDEARs Tech — migrar a Tastytrade' },
-    { k:'energy', l:'Energía / Vaca Muerta' },
-    { k:'ar',     l:'Acciones argentinas' },
+function getPriceARS(pos, prices) {
+  if (STATIC_PRICES[pos.ticker]) return STATIC_PRICES[pos.ticker];
+  const s = pos.sym;
+  if (s && prices[s]) return prices[s] * (pos.ratio || 1) * MEP;
+  return null;
+}
+
+// ═══════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bento-card px-4 py-3 shadow-2xl" style={{ minWidth: 160 }}>
+      <p className="text-xs text-slate-500 mb-1">{payload[0]?.payload?.fullDate || label}</p>
+      <p className="mono text-sm font-semibold text-white">${n(payload[0]?.value)}</p>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════
+// CHART COMPONENT
+// ═══════════════════════════════════════════
+
+function PerformanceChart({ prices }) {
+  const [period, setPeriod] = useState('1M');
+  const data = CHART_DATA[period];
+  const first = data[0]?.value || 1;
+  const last  = data[data.length-1]?.value || 1;
+  const change = ((last - first) / first * 100);
+  const isUp = change >= 0;
+  const accentColor = isUp ? '#6366f1' : '#f87171';
+
+  const periods = ['1D','1S','1M','6M','YTD','1A'];
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <p className="text-xs text-slate-500 mono uppercase tracking-widest mb-1">Rendimiento del portafolio</p>
+          <p className="mono text-2xl font-semibold text-white">${n(last)}</p>
+          <p className={`mono text-xs mt-1 ${isUp ? 'positive' : 'negative'}`}>
+            {isUp ? '▲' : '▼'} {Math.abs(change).toFixed(2)}% en el período
+          </p>
+        </div>
+        <div className="flex gap-1 p-1 rounded-xl" style={{ background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.06)' }}>
+          {periods.map(p => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all mono cursor-pointer ${p === period ? 'pill-active' : 'pill-inactive'}`}
+            >{p}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={accentColor} stopOpacity={0.25}/>
+                <stop offset="100%" stopColor={accentColor} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} horizontal={false} />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 10, fill: '#475569', fontFamily: 'Geist Mono' }}
+              axisLine={false}
+              tickLine={false}
+              interval={Math.floor(data.length / 5)}
+            />
+            <YAxis hide domain={['auto','auto']} />
+            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.08)', strokeWidth: 1 }} />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={accentColor}
+              strokeWidth={2}
+              fill="url(#grad)"
+              dot={false}
+              activeDot={{ r: 4, fill: accentColor, stroke: '#0F111A', strokeWidth: 2 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// DISTRIBUTION DONUT
+// ═══════════════════════════════════════════
+
+function DistributionCard({ prices }) {
+  const groupVals = {};
+  IOL_POSITIONS.forEach(p => {
+    const px = getPriceARS(p, prices);
+    const val = px ? px * p.qty : p.cost * p.qty;
+    groupVals[p.group] = (groupVals[p.group] || 0) + val;
+  });
+  const total = Object.values(groupVals).reduce((a,b) => a+b, 0);
+  const order = ['tech','energy','al30','cer','ar'];
+
+  // Simple SVG donut
+  const size = 120, cx = 60, cy = 60, r = 48, stroke = 12;
+  const circ = 2 * Math.PI * r;
+  let offset = 0;
+  const slices = order.map(k => {
+    const pct = total ? (groupVals[k]||0)/total : 0;
+    const dash = pct * circ;
+    const gap  = circ - dash;
+    const s = { key: k, dash, gap, offset, pct, color: GROUP_META[k].color };
+    offset += dash;
+    return s;
+  });
+
+  return (
+    <div className="h-full flex flex-col">
+      <p className="text-xs text-slate-500 mono uppercase tracking-widest mb-4">Distribución cartera</p>
+      <div className="flex items-center gap-6 flex-1">
+        <div className="relative flex-shrink-0" style={{width:size,height:size}}>
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={stroke}/>
+            {slices.map(s => s.pct > 0 && (
+              <circle
+                key={s.key}
+                cx={cx} cy={cy} r={r}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={stroke}
+                strokeDasharray={`${s.dash} ${s.gap}`}
+                strokeDashoffset={-s.offset + circ/4}
+                style={{ transform:`rotate(-90deg)`, transformOrigin:`${cx}px ${cy}px`, transition:'stroke-dasharray .6s ease' }}
+              />
+            ))}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="mono text-xs font-semibold text-white">${n(total/1000000,1)}M</span>
+            <span className="mono text-xs text-slate-500">ARS</span>
+          </div>
+        </div>
+        <div className="flex-1 space-y-2.5">
+          {order.map(k => {
+            const pct = total ? ((groupVals[k]||0)/total*100) : 0;
+            return (
+              <div key={k}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{background:GROUP_META[k].color}}/>
+                    <span className="text-xs text-slate-400">{GROUP_META[k].label}</span>
+                  </div>
+                  <span className="mono text-xs font-semibold text-white">{pct.toFixed(0)}%</span>
+                </div>
+                <div className="h-1 rounded-full" style={{background:'rgba(255,255,255,0.05)'}}>
+                  <div className="h-1 rounded-full transition-all duration-700" style={{width:`${pct}%`,background:GROUP_META[k].color}}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// POSITIONS TABLE
+// ═══════════════════════════════════════════
+
+function Badge({ type, children }) {
+  const styles = {
+    hold: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
+    wait: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+    sell: 'bg-red-500/10 text-red-400 border border-red-500/20',
+    buy:  'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+  };
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs mono font-semibold ${styles[type]||styles.hold}`}>
+      {children}
+    </span>
+  );
+}
+
+function PositionsTable({ prices, activeTab, setActiveTab }) {
+  const tabs = [
+    { id:'iol',    label:'🇦🇷 IOL' },
+    { id:'tasty',  label:'🇺🇸 Tastytrade' },
+    { id:'crypto', label:'₿ Crypto' },
+    { id:'plan',   label:'📋 Plan' },
   ];
 
-  let html = '';
-  let total = 0, totalCost = 0;
-  const gv = {};
-
-  iolData.forEach(p => {
-    const px = priceARS(p);
-    const qty = parseFloat(p.qty || p.cantidad) || 0;
-    const cost = parseFloat(p.cost || p.precio_entrada) || 0;
-    const val = px ? px * qty : cost * qty;
-    total += val;
-    totalCost += cost * qty;
-    gv[p.group || p.grupo] = (gv[p.group || p.grupo] || 0) + val;
-  });
-
-  groups.forEach(g => {
-    const items = iolData.filter(p => (p.group || p.grupo) === g.k);
-    if (!items.length) return;
-    html += `<tr class="section-sep"><td colspan="6">${g.l}</td></tr>`;
-    items.forEach(p => {
-      const px = priceARS(p);
-      const qty = parseFloat(p.qty || p.cantidad) || 0;
-      const cost = parseFloat(p.cost || p.precio_entrada) || 0;
-      const val = px ? px * qty : cost * qty;
-      const pct = (px && cost) ? ((px - cost) / cost * 100) : null;
-      const act = p.action || p.accion;
-      const lbl = p.label;
-
-      const pxHtml = px
-        ? `<span class="mono" style="color:var(--text)">${px < 1000 ? n(px,2) : n(px)} <span style="color:var(--text3);font-size:10px">ARS</span></span>`
-        : `<span style="color:var(--text3)">—</span>`;
-
-      const pctHtml = pct !== null
-        ? `<span class="badge ${pct >= 0 ? 'bg' : 'br'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}%</span>`
-        : `<span class="badge bn">—</span>`;
-
-      const actMap = { hold:'bb', wait:'ba', sell:'br' };
-      html += `<tr>
-        <td><div class="ticker">${p.ticker}</div><div class="ticker-sub">${p.nombre}</div></td>
-        <td class="hide-sm mono">${n(qty)}</td>
-        <td>${pxHtml}</td>
-        <td class="hide-sm mono">${n(val)}</td>
-        <td>${pctHtml}</td>
-        <td class="hide-sm"><span class="badge ${actMap[act]||'bn'}">${lbl}</span></td>
-      </tr>`;
-    });
-  });
-
-  // Totals row
-  const pnl = total - totalCost;
-  const pnlPct = totalCost ? (pnl/totalCost*100) : 0;
-  html += `<tr style="background:rgba(255,255,255,0.03)">
-    <td colspan="3" style="font-weight:700;font-size:12px;color:var(--text2)">TOTAL IOL</td>
-    <td class="hide-sm mono" style="font-weight:700;color:var(--text)">${n(total)}</td>
-    <td><span class="badge ${pnl>=0?'bg':'br'}">${pnl>=0?'▲':'▼'} ${Math.abs(pnlPct).toFixed(1)}%</span></td>
-    <td></td>
-  </tr>`;
-
-  tbody.innerHTML = html;
-
-  // KPI
-  document.getElementById('kpi-iol').textContent = '$' + n(total);
-  document.getElementById('kpi-iol-pnl').innerHTML =
-    `<span class="${pnl>=0?'up':'down'}">${pnl>=0?'▲':'▼'} $${n(Math.abs(pnl))} (${Math.abs(pnlPct).toFixed(1)}%)</span>`;
-
-  // Donut
-  document.getElementById('donut-val').textContent = '$' + n(total);
-  const order = ['tech','energy','al30','cer','ar'];
-  const vals = order.map(k => gv[k]||0);
-  const cols = order.map(k => GRP_COLOR[k]);
-
-  if (donutChart) { donutChart.data.datasets[0].data = vals; donutChart.update('active'); }
-  else {
-    donutChart = new Chart(document.getElementById('donutChart'), {
-      type: 'doughnut',
-      data: { datasets: [{ data: vals, backgroundColor: cols, borderWidth: 2, borderColor: '#0d1117', hoverBorderWidth: 0 }] },
-      options: {
-        cutout: '74%',
-        animation: { animateRotate: true, duration: 800 },
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` $${n(ctx.raw)}` }, backgroundColor: '#161e28', titleColor: '#f0f4f8', bodyColor: '#8b95a1', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 }
-        }
-      }
-    });
-  }
-
-  const listEl = document.getElementById('alloc-list');
-  listEl.innerHTML = order.map(k => {
-    const pct = total ? ((gv[k]||0)/total*100) : 0;
-    return `<div class="alloc-item">
-      <div class="alloc-left">
-        <div class="alloc-dot" style="background:${GRP_COLOR[k]}"></div>
-        <span class="alloc-name">${GRP_LABEL[k]}</span>
+  return (
+    <div className="h-full flex flex-col">
+      {/* Tab bar */}
+      <div className="flex items-center gap-1 mb-4 p-1 rounded-xl w-fit" style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)'}}>
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${t.id===activeTab ? 'pill-active' : 'pill-inactive'}`}
+          >{t.label}</button>
+        ))}
       </div>
-      <div class="alloc-bar-wrap">
-        <div class="alloc-bar" style="width:${pct}%;background:${GRP_COLOR[k]}"></div>
+
+      <div className="flex-1 overflow-auto">
+        {activeTab === 'iol' && <IOLTable prices={prices}/>}
+        {activeTab === 'tasty' && <TastyTable prices={prices}/>}
+        {activeTab === 'crypto' && <CryptoTable prices={prices}/>}
+        {activeTab === 'plan' && <PlanList/>}
       </div>
-      <div class="alloc-pct">${pct.toFixed(0)}%</div>
-    </div>`;
-  }).join('');
+    </div>
+  );
 }
 
-// ── RENDER TASTY ──────────────────────────────────────────────
-function renderTasty() {
-  const tbody = document.getElementById('tasty-tbody');
-  tbody.innerHTML = tastyData.map(p => {
-    const s = p.sym || p.yahoo_symbol || '';
-    const px = s && prices[s] ? prices[s] : null;
-    const qty = parseFloat(p.qty || p.cantidad) || 0;
-    const cost = parseFloat(p.cost || p.precio_entrada_usd) || 0;
-    const pct = (px && cost) ? ((px-cost)/cost*100) : null;
-    const pctHtml = pct !== null
-      ? `<span class="badge ${pct>=0?'bg':'br'}">${pct>=0?'▲':'▼'} ${Math.abs(pct).toFixed(1)}%</span>`
-      : `<span class="badge bn">—</span>`;
-    return `<tr>
-      <td><div class="ticker">${p.ticker}</div><div class="ticker-sub">${p.nombre}</div></td>
-      <td style="text-align:left;color:var(--text2);font-size:12px">${p.action || p.accion || '—'}</td>
-      <td class="mono">${px ? `${n(px,2)} <span style="color:var(--text3);font-size:10px">USD</span>` : '—'}</td>
-      <td>${pctHtml}</td>
-      <td><span class="badge ${qty>0?'bg':'bp'}">${qty>0?'activa':'1 abril'}</span></td>
-    </tr>`;
-  }).join('');
+function IOLTable({ prices }) {
+  const groups = [
+    { k:'cer',    l:'Bonos CER' },
+    { k:'al30',   l:'Bono USD' },
+    { k:'tech',   l:'CEDEARs Tech' },
+    { k:'energy', l:'Energía' },
+    { k:'ar',     l:'Acciones AR' },
+  ];
+
+  return (
+    <table className="w-full">
+      <thead>
+        <tr>
+          {['Activo','Cant.','Precio ARS','Total ARS','P&L','Estado'].map((h,i) => (
+            <th key={h} className={`mono text-xs font-medium text-slate-600 uppercase tracking-widest pb-3 ${i===0?'text-left':'text-right'} ${i>3?'hidden sm:table-cell':''}`}>{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {groups.map(g => {
+          const items = IOL_POSITIONS.filter(p => p.group === g.k);
+          if (!items.length) return null;
+          return [
+            <tr key={`sep-${g.k}`}>
+              <td colSpan={6} className="mono text-xs text-slate-600 uppercase tracking-widest py-2 pt-4" style={{borderTop:'1px solid rgba(255,255,255,0.04)'}}>{g.l}</td>
+            </tr>,
+            ...items.map(p => {
+              const px = getPriceARS(p, prices);
+              const val = px ? px*p.qty : p.cost*p.qty;
+              const pct = (px && p.cost) ? ((px-p.cost)/p.cost*100) : null;
+              return (
+                <tr key={p.ticker} className="row-hover">
+                  <td className="py-2.5">
+                    <div className="mono text-sm font-semibold text-white">{p.ticker}</div>
+                    <div className="mono text-xs text-slate-500 mt-0.5">{p.name}</div>
+                  </td>
+                  <td className="mono text-sm text-right text-slate-400">{n(p.qty)}</td>
+                  <td className="mono text-sm text-right text-white">{px ? n(px, px<1000?2:0) : <span className="text-slate-600">—</span>}</td>
+                  <td className="mono text-sm text-right text-slate-300">{n(val)}</td>
+                  <td className="text-right hidden sm:table-cell">
+                    {pct !== null
+                      ? <span className={`mono text-xs font-semibold ${pct>=0?'positive':'negative'}`}>{pct>=0?'▲':'▼'} {Math.abs(pct).toFixed(1)}%</span>
+                      : <span className="mono text-xs text-slate-600">—</span>
+                    }
+                  </td>
+                  <td className="text-right hidden sm:table-cell">
+                    <Badge type={p.action}>{p.label}</Badge>
+                  </td>
+                </tr>
+              );
+            })
+          ];
+        })}
+      </tbody>
+    </table>
+  );
 }
 
-// ── RENDER CRYPTO ─────────────────────────────────────────────
-function renderCrypto() {
-  const tbody = document.getElementById('crypto-tbody');
-  let totalUSD = 0;
-
-  tbody.innerHTML = cryptoData.map(p => {
-    const s = p.sym || p.yahoo_symbol || '';
-    const px = s && prices[s] ? prices[s] : null;
-    const qty = parseFloat(p.qty || p.cantidad) || 0;
-    const cost = parseFloat(p.cost || p.precio_entrada_usd) || 0;
-    const val = px ? px*qty : cost*qty;
-    totalUSD += val;
-    const pct = (px && cost) ? ((px-cost)/cost*100) : null;
-    const pctHtml = pct !== null
-      ? `<span class="badge ${pct>=0?'bg':'br'}">${pct>=0?'▲':'▼'} ${Math.abs(pct).toFixed(1)}%</span>`
-      : `<span class="badge bn">—</span>`;
-    return `<tr>
-      <td><div class="ticker">${p.ticker}</div><div class="ticker-sub">${p.nombre}</div></td>
-      <td class="mono">${qty.toFixed(6)}</td>
-      <td class="mono">${px ? n(px,0) : n(cost,0)} <span style="color:var(--text3);font-size:10px">USD</span></td>
-      <td class="mono">${n(val,2)} <span style="color:var(--text3);font-size:10px">USD</span></td>
-      <td>${pctHtml}</td>
-      <td><span class="badge bc">${p.platform || p.plataforma}</span></td>
-    </tr>`;
-  }).join('');
-
-  document.getElementById('kpi-btc').textContent = `USD ${n(totalUSD,2)}`;
-  const btc = cryptoData.find(p => p.ticker==='BTC');
-  if (btc) {
-    const s = btc.sym || 'BTC-USD';
-    const px = prices[s];
-    const cost = parseFloat(btc.cost || btc.precio_entrada_usd) || 0;
-    if (px && cost) {
-      const pct = ((px-cost)/cost*100);
-      document.getElementById('kpi-btc-sub').innerHTML =
-        `<span class="${pct>=0?'up':'down'}">${pct>=0?'▲':'▼'} ${Math.abs(pct).toFixed(1)}% vs entrada</span>`;
-    } else {
-      document.getElementById('kpi-btc-sub').innerHTML = `<span class="flat">entrada USD ${n(cost,0)}</span>`;
-    }
-  }
+function TastyTable({ prices }) {
+  return (
+    <table className="w-full">
+      <thead>
+        <tr>
+          {['Activo','Precio USD','Estado','Cuándo'].map((h,i) => (
+            <th key={h} className={`mono text-xs font-medium text-slate-600 uppercase tracking-widest pb-3 ${i===0?'text-left':'text-right'}`}>{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {TASTY_POSITIONS.map(p => {
+          const px = p.sym && prices[p.sym] ? prices[p.sym] : null;
+          return (
+            <tr key={p.ticker} className="row-hover">
+              <td className="py-2.5">
+                <div className="mono text-sm font-semibold text-white">{p.ticker}</div>
+                <div className="mono text-xs text-slate-500 mt-0.5">{p.name}</div>
+              </td>
+              <td className="mono text-sm text-right text-white">{px ? `${n(px,2)} USD` : <span className="text-slate-600">—</span>}</td>
+              <td className="text-right"><span className="mono text-xs text-slate-400">{p.action}</span></td>
+              <td className="text-right"><Badge type="buy">1 abril</Badge></td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
 }
 
-// ── TAB SWITCH ────────────────────────────────────────────────
-function showTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function CryptoTable({ prices }) {
+  return (
+    <table className="w-full">
+      <thead>
+        <tr>
+          {['Activo','Cantidad','Precio USD','Valor USD','P&L','Plataforma'].map((h,i) => (
+            <th key={h} className={`mono text-xs font-medium text-slate-600 uppercase tracking-widest pb-3 ${i===0?'text-left':'text-right'}`}>{h}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {CRYPTO_POSITIONS.map(p => {
+          const px = p.sym && prices[p.sym] ? prices[p.sym] : null;
+          const val = px ? px*p.qty : p.cost*p.qty;
+          const pct = (px && p.cost) ? ((px-p.cost)/p.cost*100) : null;
+          return (
+            <tr key={p.ticker} className="row-hover">
+              <td className="py-3">
+                <div className="mono text-sm font-semibold text-white">{p.ticker}</div>
+                <div className="mono text-xs text-slate-500 mt-0.5">{p.name}</div>
+              </td>
+              <td className="mono text-sm text-right text-slate-300">{p.qty.toFixed(6)}</td>
+              <td className="mono text-sm text-right text-white">{px ? n(px,0) : n(p.cost,0)} <span className="text-slate-600 text-xs">USD</span></td>
+              <td className="mono text-sm text-right text-slate-300">{n(val,2)} <span className="text-slate-600 text-xs">USD</span></td>
+              <td className="text-right">
+                {pct !== null
+                  ? <span className={`mono text-xs font-semibold ${pct>=0?'positive':'negative'}`}>{pct>=0?'▲':'▼'} {Math.abs(pct).toFixed(1)}%</span>
+                  : <span className="mono text-xs" style={{color:'#f59e0b'}}>entrada USD {n(p.cost,0)}</span>
+                }
+              </td>
+              <td className="text-right"><span className="mono text-xs px-2 py-0.5 rounded" style={{background:'rgba(34,211,238,0.08)',color:'#22d3ee'}}>{p.platform}</span></td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
 }
 
-// ── LOAD ALL ──────────────────────────────────────────────────
-async function loadAll() {
-  const btn = document.getElementById('refresh-btn');
-  const icon = document.getElementById('refresh-icon');
-  btn.classList.add('spin-active');
-  icon.classList.add('spinning');
+function PlanList() {
+  const dotColor = { hot:'#f87171', warm:'#f59e0b', cold:'#475569' };
+  const badgeStyle = {
+    hot:  'bg-red-500/10 text-red-400 border border-red-500/20',
+    warm: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+    cold: 'bg-slate-700/50 text-slate-500 border border-slate-700',
+  };
+  const badgeLabel = { hot:'HOY', warm:'MAÑANA', cold:'FUTURO' };
 
-  const cfg = getCfg();
-  MEP = cfg.mep || 1422;
-  document.getElementById('kpi-mep').textContent = '$' + n(MEP);
-
-  // Reset to fallback
-  iolData = [...IOL_FB];
-  tastyData = [...TASTY_FB];
-  cryptoData = [...CRYPTO_FB];
-
-  // Try sheet
-  if (cfg.url) {
-    const sd = await fetchSheet(cfg.url);
-    if (sd) {
-      if (sd.iol?.length) iolData = sd.iol;
-      if (sd.tastytrade?.length) tastyData = sd.tastytrade;
-      if (sd.crypto?.length) cryptoData = sd.crypto;
-      if (sd.config?.mep) MEP = parseFloat(sd.config.mep) || MEP;
-    }
-  }
-
-  // Fetch prices
-  const syms = [...new Set([
-    ...iolData.map(p => p.sym || p.yahoo_symbol || ''),
-    ...tastyData.map(p => p.sym || p.yahoo_symbol || ''),
-    ...cryptoData.map(p => p.sym || p.yahoo_symbol || ''),
-  ].filter(Boolean))];
-
-  const res = await Promise.all(syms.map(s => fetchPrice(s).then(p => ({s,p}))));
-  res.forEach(({s,p}) => { if (p) prices[s] = p; });
-
-  renderIOL();
-  renderTasty();
-  renderCrypto();
-
-  const now = new Date();
-  document.getElementById('last-update').textContent =
-    `actualizado ${now.toLocaleDateString('es-AR')} · ${now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`;
-
-  btn.classList.remove('spin-active');
-  icon.classList.remove('spinning');
+  return (
+    <div className="space-y-0">
+      {PLAN_ITEMS.map((item, i) => (
+        <div key={i} className="flex items-center gap-4 py-3 row-hover px-1 rounded-lg" style={{borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+          <div className="mono text-xs text-slate-600 w-12 flex-shrink-0">{item.date}</div>
+          <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{background:dotColor[item.urgency]}}/>
+          <div className="flex-1 min-w-0">
+            <span className="mono text-xs font-bold text-white mr-2">{item.ticker}</span>
+            <span className="text-xs text-slate-400">{item.desc}</span>
+          </div>
+          <span className={`mono text-xs px-2 py-0.5 rounded-md font-semibold flex-shrink-0 ${badgeStyle[item.urgency]}`}>{badgeLabel[item.urgency]}</span>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-loadAll();
+// ═══════════════════════════════════════════
+// KPI CARD
+// ═══════════════════════════════════════════
+
+function KpiCard({ label, value, sub, subColor='neutral', accent, delay='' }) {
+  const subColors = {
+    positive: 'positive',
+    negative: 'negative',
+    neutral:  'neutral',
+  };
+  return (
+    <div className={`bento-card p-5 relative overflow-hidden fade-up-${delay}`}>
+      <div className="absolute top-0 left-0 right-0 h-px opacity-60" style={{background:`linear-gradient(90deg, transparent, ${accent}, transparent)`}}/>
+      <p className="mono text-xs text-slate-600 uppercase tracking-widest mb-2">{label}</p>
+      <p className="mono text-2xl font-semibold text-white leading-none mb-1.5">{value}</p>
+      <p className={`mono text-xs ${subColors[subColor]}`}>{sub}</p>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// CONFIG PANEL
+// ═══════════════════════════════════════════
+
+function ConfigPanel({ open, onClose, onSave }) {
+  const [url, setUrl] = useState('');
+  const [mep, setMep] = useState(1422);
+
+  useEffect(() => {
+    try { const c = JSON.parse(localStorage.getItem('pf_cfg')||'{}'); if (c.url) setUrl(c.url); if (c.mep) setMep(c.mep); } catch {}
+  }, [open]);
+
+  const save = () => { localStorage.setItem('pf_cfg', JSON.stringify({url, mep})); onSave(); onClose(); };
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-end" style={{background:'rgba(0,0,0,.6)',backdropFilter:'blur(6px)'}} onClick={onClose}>
+      <div className="w-96 h-screen overflow-y-auto p-8" style={{background:'#161B22',borderLeft:'1px solid rgba(255,255,255,0.08)'}} onClick={e=>e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-lg font-bold text-white">Configuración</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors text-xl cursor-pointer">✕</button>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <label className="mono text-xs text-slate-500 uppercase tracking-widest block mb-2">URL Apps Script</label>
+            <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://script.google.com/macros/s/..."
+              className="w-full px-4 py-3 rounded-xl mono text-xs text-white outline-none transition-all"
+              style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}
+              onFocus={e=>e.target.style.borderColor='rgba(99,102,241,0.5)'}
+              onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.08)'}
+            />
+            <p className="mono text-xs text-slate-600 mt-2 leading-relaxed">Pegá la URL del Apps Script deployado para sincronizar posiciones.</p>
+          </div>
+
+          <div>
+            <label className="mono text-xs text-slate-500 uppercase tracking-widest block mb-2">Dólar MEP (ARS)</label>
+            <input type="number" value={mep} onChange={e=>setMep(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl mono text-sm text-white outline-none"
+              style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}
+            />
+          </div>
+
+          <button onClick={save} className="w-full py-3 rounded-xl mono text-sm font-bold text-black cursor-pointer transition-all hover:opacity-90"
+            style={{background:'linear-gradient(135deg,#6366f1,#8b5cf6)'}}>
+            Guardar y recargar
+          </button>
+
+          <div className="rounded-xl p-5 space-y-3" style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.05)'}}>
+            <p className="mono text-xs text-slate-500 uppercase tracking-widest">Cómo conectar Google Sheet</p>
+            {['Abrí tu Sheet → Extensions → Apps Script','Pegá el código de APPS_SCRIPT.gs','Deploy → New deployment → Web app','Execute as: Me · Access: Anyone','Copiá la URL y pegala arriba 👆'].map((s,i) => (
+              <div key={i} className="flex gap-3 items-start">
+                <div className="w-5 h-5 rounded-full mono text-xs flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{background:'rgba(99,102,241,0.1)',border:'1px solid rgba(99,102,241,0.2)',color:'#818cf8'}}>{i+1}</div>
+                <p className="text-xs text-slate-500 leading-relaxed">{s}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// NAV SIDEBAR
+// ═══════════════════════════════════════════
+
+function Sidebar({ onCfg }) {
+  const icons = [
+    { icon:'⊞', label:'Dashboard', active:true },
+    { icon:'◈', label:'Portfolio' },
+    { icon:'↕', label:'Transacciones' },
+  ];
+  return (
+    <aside className="hidden md:flex flex-col items-center gap-2 py-6 px-3" style={{width:64,background:'#0d1016',borderRight:'1px solid rgba(255,255,255,0.05)'}}>
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-6 text-lg"
+        style={{background:'linear-gradient(135deg,#6366f1,#8b5cf6)',boxShadow:'0 0 20px rgba(99,102,241,0.3)'}}>
+        📈
+      </div>
+      {icons.map(i => (
+        <div key={i.label} title={i.label}
+          className={`w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all text-base ${i.active ? 'text-indigo-400' : 'text-slate-600 hover:text-slate-400'}`}
+          style={i.active ? {background:'rgba(99,102,241,0.12)',border:'1px solid rgba(99,102,241,0.2)'} : {}}>
+          {i.icon}
+        </div>
+      ))}
+      <div className="flex-1"/>
+      <div onClick={onCfg} title="Configuración"
+        className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer text-slate-600 hover:text-slate-400 transition-all text-base">
+        ⚙
+      </div>
+    </aside>
+  );
+}
+
+// ═══════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════
+
+function App() {
+  const [prices, setPrices]     = useState({});
+  const [loading, setLoading]   = useState(true);
+  const [lastUpdate, setLastUpdate] = useState('');
+  const [cfgOpen, setCfgOpen]   = useState(false);
+  const [activeTab, setActiveTab] = useState('iol');
+  const [spinning, setSpinning] = useState(false);
+
+  const loadPrices = useCallback(async () => {
+    setSpinning(true);
+    const syms = [...new Set([
+      ...IOL_POSITIONS.map(p=>p.sym).filter(Boolean),
+      ...TASTY_POSITIONS.map(p=>p.sym).filter(Boolean),
+      ...CRYPTO_POSITIONS.map(p=>p.sym).filter(Boolean),
+    ])];
+    const res = await Promise.all(syms.map(s => fetchLivePrice(s).then(p=>({s,p}))));
+    const map = {};
+    res.forEach(({s,p}) => { if (p) map[s] = p; });
+    setPrices(map);
+    setLastUpdate(new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}));
+    setLoading(false);
+    setSpinning(false);
+  }, []);
+
+  useEffect(() => { loadPrices(); }, []);
+
+  // Compute KPIs
+  let iolTotal = 0, iolCost = 0;
+  IOL_POSITIONS.forEach(p => {
+    const px = getPriceARS(p, prices);
+    iolTotal += px ? px*p.qty : p.cost*p.qty;
+    iolCost  += p.cost * p.qty;
+  });
+  const iolPnl    = iolTotal - iolCost;
+  const iolPnlPct = iolCost ? (iolPnl/iolCost*100) : 0;
+  const btcPos    = CRYPTO_POSITIONS[0];
+  const btcPx     = prices['BTC-USD'];
+  const btcVal    = btcPx ? btcPx*btcPos.qty : btcPos.cost*btcPos.qty;
+  const btcPct    = btcPx ? ((btcPx-btcPos.cost)/btcPos.cost*100) : null;
+
+  return (
+    <div className="flex min-h-screen" style={{background:'#0F111A'}}>
+      <Sidebar onCfg={() => setCfgOpen(true)}/>
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="flex items-center justify-between px-8 py-5 fade-up" style={{borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight">Mi Portafolio</h1>
+            <p className="mono text-xs text-slate-600 mt-0.5">
+              {loading ? <span className="loading-pulse">cargando precios...</span> : `actualizado ${lastUpdate}`}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{background:'rgba(16,185,129,0.08)',border:'1px solid rgba(16,185,129,0.15)'}}>
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{animation:'shimmer 2s infinite'}}/>
+              <span className="mono text-xs text-emerald-500 font-semibold">en vivo</span>
+            </div>
+            <button onClick={() => setCfgOpen(true)}
+              className="px-3 py-1.5 rounded-lg mono text-xs text-slate-400 cursor-pointer transition-all hover:text-white"
+              style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.07)'}}>
+              ⚙ Sheet
+            </button>
+            <button onClick={loadPrices} disabled={spinning}
+              className="px-4 py-1.5 rounded-lg mono text-xs font-bold text-black cursor-pointer transition-all hover:opacity-90"
+              style={{background:'linear-gradient(135deg,#6366f1,#8b5cf6)',opacity:spinning?.6:1}}>
+              <span style={{display:'inline-block',animation:spinning?'spin .7s linear infinite':'none'}}>↻</span> Actualizar
+            </button>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 overflow-auto p-6">
+
+          {/* KPIs */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
+            <KpiCard delay="1" label="Total IOL · ARS" value={loading ? '...' : '$'+n(iolTotal)}
+              sub={loading ? '—' : `${iolPnl>=0?'▲':'▼'} ${Math.abs(iolPnlPct).toFixed(1)}% total`}
+              subColor={iolPnl>=0?'positive':'negative'} accent="#6366f1"/>
+            <KpiCard delay="2" label="Tastytrade · USD" value="USD 0" sub="fondeo 1 abril" subColor="neutral" accent="#22d3ee"/>
+            <KpiCard delay="3" label="Bitcoin · USD" value={loading ? '...' : `USD ${n(btcVal,2)}`}
+              sub={btcPct!=null ? `${btcPct>=0?'▲':'▼'} ${Math.abs(btcPct).toFixed(1)}% vs entrada` : `entrada USD ${n(btcPos.cost,0)}`}
+              subColor={btcPct!=null?(btcPct>=0?'positive':'negative'):'neutral'} accent="#f59e0b"/>
+            <KpiCard delay="4" label="Dólar MEP" value="$1.422" sub="referencia manual" subColor="neutral" accent="#a78bfa"/>
+            <KpiCard delay="5" label="Riesgo País" value="595 pb" sub="↓ mínimo reciente" subColor="positive" accent="#10b981"/>
+          </div>
+
+          {/* Bento grid */}
+          <div className="grid gap-4" style={{gridTemplateColumns:'1fr 1fr 340px',gridTemplateRows:'260px auto'}}>
+
+            {/* Chart - spans 2 cols */}
+            <div className="bento-card p-6 fade-up-2" style={{gridColumn:'1/3'}}>
+              <PerformanceChart prices={prices}/>
+            </div>
+
+            {/* Distribution */}
+            <div className="bento-card p-6 fade-up-3" style={{gridRow:'1/2'}}>
+              <DistributionCard prices={prices}/>
+            </div>
+
+            {/* Positions table - full width */}
+            <div className="bento-card p-6 fade-up-4" style={{gridColumn:'1/4'}}>
+              <PositionsTable prices={prices} activeTab={activeTab} setActiveTab={setActiveTab}/>
+            </div>
+
+          </div>
+        </main>
+      </div>
+
+      <ConfigPanel open={cfgOpen} onClose={() => setCfgOpen(false)} onSave={loadPrices}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
