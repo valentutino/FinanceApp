@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --surface2: #f7f8fa;
+      --border: #e4e7ec;
+      --text: #0f1117;
+      --text2: #5a6474;
+      --text3: #9ba5b4;
+      --green: #00a854;
+      --green-bg: #e6f7ef;
+      --red: #e53935;
+      --red-bg: #fde8e8;
+      --amber: #e67e00;
+      --amber-bg: #fff3e0;
+      --blue: #1a56db;
+      --blue-bg: #e8f0fe;
+      --purple: #6741d9;
+      --purple-bg: #ede9fe;
+      --cyan: #0891b2;
+      --cyan-bg: #e0f7fa;
+      --gold: #b8860b;
+      --gold-bg: #fef9e7;
+      --sidebar: 56px;
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      font-size: 13px;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar);
+      background: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      gap: 4px;
+    }
+
+    .sidebar-logo {
+      width: 36px; height: 36px;
+      background: var(--green);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .nav-btn {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all .15s;
+      color: #9ba5b4;
+      border: none;
+      background: transparent;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .nav-btn.active {
+      background: rgba(0,168,84,0.2);
+      color: var(--green);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Main ── */
+    .main {
+      margin-left: var(--sidebar);
+      flex: 1;
+      padding: 24px;
+      max-width: calc(100vw - var(--sidebar));
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .header-left h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-left p {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 2px;
+      font-family: var(--mono);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      font-family: var(--font);
+      transition: all .15s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn:hover { border-color: var(--text3); color: var(--text); }
+    .btn-primary { background: var(--text); color: white; border-color: var(--text); }
+    .btn-primary:hover { background: #1f2937; color: white; }
+    .btn.loading { opacity: .5; pointer-events: none; }
+    .btn-config { background: var(--blue-bg); color: var(--blue); border-color: transparent; }
+
+    /* ── KPI Row ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .kpi.green::before { background: var(--green); }
+    .kpi.blue::before { background: var(--blue); }
+    .kpi.purple::before { background: var(--purple); }
+    .kpi.amber::before { background: var(--amber); }
+    .kpi.gold::before { background: var(--gold); }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      color: var(--text);
+      font-family: var(--mono);
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      margin-top: 4px;
+      font-family: var(--mono);
+    }
+
+    .up { color: var(--green); }
+    .down { color: var(--red); }
+    .neutral { color: var(--text3); }
+
+    /* ── Grid ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .card-sub {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--surface2);
+      padding: 3px;
+      border-radius: 8px;
+    }
+
+    .tab {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      font-family: var(--font);
+      transition: all .15s;
+      letter-spacing: 0.2px;
+    }
+
+    .tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 8px 18px;
+      text-align: right;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th:first-child { text-align: left; }
+
+    td {
+      padding: 10px 18px;
+      font-size: 12px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    td:first-child { text-align: left; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .section-row td {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: var(--bg);
+      padding: 6px 18px;
+    }
+
+    .ticker { font-weight: 700; font-size: 12px; font-family: var(--mono); }
+    .ticker-name { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .price { font-family: var(--mono); font-weight: 500; }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .bg { background: var(--green-bg); color: var(--green); }
+    .br { background: var(--red-bg); color: var(--red); }
+    .ba { background: var(--amber-bg); color: var(--amber); }
+    .bb { background: var(--blue-bg); color: var(--blue); }
+    .bp { background: var(--purple-bg); color: var(--purple); }
+    .bc { background: var(--cyan-bg); color: var(--cyan); }
+    .bn { background: var(--surface2); color: var(--text3); }
+
+    /* ── Donut ── */
+    .donut-wrap { padding: 16px 18px; }
+    .donut-container { width: 140px; height: 140px; margin: 8px auto 16px; position: relative; }
+    .donut-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .donut-center-val { font-size: 14px; font-weight: 700; font-family: var(--mono); }
+    .donut-center-label { font-size: 9px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .alloc-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .alloc-row:last-child { border-bottom: none; }
+    .alloc-left { display: flex; align-items: center; gap: 8px; }
+    .alloc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .alloc-pct { font-weight: 700; font-family: var(--mono); font-size: 12px; }
+
+    /* ── Pending Plan ── */
+    .plan-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .plan-item:last-child { border-bottom: none; }
+    .plan-date {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      min-width: 60px;
+    }
+    .plan-desc { flex: 1; color: var(--text2); }
+    .plan-ticker { font-weight: 700; color: var(--text); font-family: var(--mono); }
+
+    /* ── Config Panel ── */
+    .config-panel {
+      display: none;
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 360px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      z-index: 200;
+      padding: 24px;
+      overflow-y: auto;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.08);
+    }
+    .config-panel.open { display: block; }
+    .config-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+    .config-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .config-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--text);
+      background: var(--surface2);
+      margin-bottom: 16px;
+      outline: none;
+    }
+    .config-input:focus { border-color: var(--blue); background: white; }
+    .config-hint { font-size: 11px; color: var(--text3); margin-top: -10px; margin-bottom: 16px; line-height: 1.5; }
+
+    /* ── Live dot ── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .live { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); font-weight: 600; }
+    .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display: inline-block; }
+
+    /* ── Tab content ── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Responsive ── */
+    @media(max-width:1100px) {
+      .kpi-row { grid-template-columns: repeat(3,1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media(max-width:700px) {
+      .main { padding: 12px; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">📈</div>
+  <button class="nav-btn active" title="Dashboard">◻</button>
+  <button class="nav-btn" title="IOL">🇦🇷</button>
+  <button class="nav-btn" title="Tastytrade">🇺🇸</button>
+  <button class="nav-btn" title="Crypto">₿</button>
+  <div class="sidebar-bottom">
+    <button class="nav-btn" title="Configurar" onclick="toggleConfig()">⚙️</button>
+  </div>
+</aside>
+
+<!-- Config Panel -->
+<div class="config-panel" id="config-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div class="config-title">⚙️ Configuración</div>
+    <button class="btn" onclick="toggleConfig()">✕ Cerrar</button>
+  </div>
+
+  <div class="config-label">URL de Google Apps Script</div>
+  <input class="config-input" id="sheet-url" placeholder="https://script.google.com/macros/s/..." />
+  <div class="config-hint">Pegá la URL de tu Apps Script deployado. El dashboard leerá tus posiciones automáticamente.</div>
+
+  <div class="config-label">Dólar MEP (ARS)</div>
+  <input class="config-input" id="mep-rate" type="number" placeholder="1422" value="1422" />
+
+  <button class="btn btn-primary" style="width:100%" onclick="saveConfig()">💾 Guardar y recargar</button>
+
+  <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+    <div class="config-label">Instrucciones</div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.7">
+      1. Abrí tu Google Sheet<br>
+      2. Extensions → Apps Script<br>
+      3. Pegá el código de APPS_SCRIPT.gs<br>
+      4. Deploy → New deployment → Web app<br>
+      5. Execute as: Me | Access: Anyone<br>
+      6. Copiá la URL y pegala arriba
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Mi Portafolio</h1>
+      <p id="last-update">Cargando datos...</p>
+    </div>
+    <div class="header-right">
+      <div class="live"><span class="live-dot"></span>En vivo</div>
+      <button class="btn btn-config" onclick="toggleConfig()">⚙️ Google Sheet</button>
+      <button class="btn btn-primary" id="refresh-btn" onclick="loadAll()">
+        <span id="refresh-icon">↻</span> Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi green">
+      <div class="kpi-label">Total IOL (ARS)</div>
+      <div class="kpi-value" id="kpi-iol">—</div>
+      <div class="kpi-sub" id="kpi-iol-pnl"><span class="neutral">Calculando…</span></div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">Tastytrade (USD)</div>
+      <div class="kpi-value" id="kpi-tasty">USD 0</div>
+      <div class="kpi-sub"><span class="neutral">Pendiente fondeo</span></div>
+    </div>
+    <div class="kpi gold">
+      <div class="kpi-label">Bitcoin (USD)</div>
+      <div class="kpi-value" id="kpi-btc">—</div>
+      <div class="kpi-sub" id="kpi-btc-pnl"><span class="neutral">Calculando…</span></div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Dólar MEP</div>
+      <div class="kpi-value" id="kpi-mep">$1.422</div>
+      <div class="kpi-sub"><span class="neutral">Referencia manual</span></div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-label">Riesgo País</div>
+      <div class="kpi-value up">595 pb</div>
+      <div class="kpi-sub up">↓ Mínimo reciente</div>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="grid-2">
+
+    <!-- Positions card -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Posiciones</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('iol',this)">🇦🇷 IOL</button>
+            <button class="tab" onclick="showTab('tasty',this)">🇺🇸 Tasty</button>
+            <button class="tab" onclick="showTab('crypto',this)">₿ Crypto</button>
+            <button class="tab" onclick="showTab('plan',this)">📋 Plan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- IOL -->
+      <div class="tab-content active" id="tab-iol">
+        <table>
+          <thead><tr>
+            <th>Activo</th>
+            <th class="hide-sm">Cant.</th>
+            <th>Precio</th>
+            <th class="hide-sm">Total ARS</th>
+            <th>P&L</th>
+            <th class="hide-sm">Estado</th>
+          </tr></thead>
+          <tbody id="iol-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3)">
+              <div style="font-size:24px;margin-bottom:8px">📊</div>
+              Configurá tu Google Sheet para ver posiciones en vivo
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tastytrade -->
+      <div class="tab-content" id="tab-tasty">
+        <table>
+          <thead><tr>
+            <th>Activo</th>
+            <th>Descripción</th>
+            <th>Precio USD</th>
+            <th>P&L USD</th>
+            <th>Estado</th>
+          </tr></thead>
+          <tbody id="tasty-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text3)">
+              <div style="font-size:24px;margin-bottom:8px">🇺🇸</div>
+              Posiciones pendientes de fondeo (1 abril)
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Crypto -->
+      <div class="tab-content" id="tab-crypto">
+        <table>
+          <thead><tr>
+            <th>Activo</th>
+            <th>Cantidad</th>
+            <th>Precio USD</th>
+            <th>Valor USD</th>
+            <th>P&L</th>
+            <th>Plataforma</th>
+          </tr></thead>
+          <tbody id="crypto-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Plan -->
+      <div class="tab-content" id="tab-plan">
+        <div class="plan-item">
+          <div class="plan-date">31 MAR</div>
+          <div class="plan-desc"><span class="plan-ticker">PAMP</span> · Comprar ~27 acciones en IOL con $133.000</div>
+          <span class="badge bb">pendiente</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">31 MAR</div>
+          <div class="plan-desc"><span class="plan-ticker">TZXD7</span> · Comprar CER 2027 en IOL con $50.000</div>
+          <span class="badge bb">pendiente</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">31 MAR</div>
+          <div class="plan-desc"><span class="plan-ticker">BTC</span> · Comprar $60.000 ARS en Binance</div>
+          <span class="badge bb">pendiente</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">1 ABR</div>
+          <div class="plan-desc"><span class="plan-ticker">SPY</span> · Vender 4 CEDEARs IOL → comprar en Tastytrade</div>
+          <span class="badge ba">mañana</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">1 ABR</div>
+          <div class="plan-desc"><span class="plan-ticker">VWO / EWZ / GLD</span> · Comprar fraccionario en Tastytrade</div>
+          <span class="badge ba">mañana</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">28 ABR</div>
+          <div class="plan-desc"><span class="plan-ticker">VIST</span> · Evaluar posición post earnings</div>
+          <span class="badge bn">futuro</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">8 MAY</div>
+          <div class="plan-desc"><span class="plan-ticker">YPFD</span> · Earnings — evaluar reentrada</div>
+          <span class="badge bn">futuro</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">13 MAY</div>
+          <div class="plan-desc"><span class="plan-ticker">PAMP</span> · Earnings Q1 2026</div>
+          <span class="badge bn">futuro</span>
+        </div>
+        <div class="plan-item">
+          <div class="plan-date">20 MAY</div>
+          <div class="plan-desc"><span class="plan-ticker">NVDA</span> · Earnings — evaluar migrar a Tastytrade</div>
+          <span class="badge bn">futuro</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Distribución</div>
+          <div class="card-sub">Por categoría</div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut-container">
+          <canvas id="donutChart"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-val" id="donut-total">—</div>
+            <div class="donut-center-label">total ARS</div>
+          </div>
+        </div>
+        <div id="alloc-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const CONFIG_KEY = 'portfolio_config';
+
+function getConfig() {
+  try {
+    return JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+  } catch { return {}; }
+}
+
+function saveConfig() {
+  const url = document.getElementById('sheet-url').value.trim();
+  const mep = parseFloat(document.getElementById('mep-rate').value) || 1422;
+  localStorage.setItem(CONFIG_KEY, JSON.stringify({ sheetUrl: url, mep }));
+  toggleConfig();
+  loadAll();
+}
+
+function toggleConfig() {
+  const panel = document.getElementById('config-panel');
+  panel.classList.toggle('open');
+  const cfg = getConfig();
+  if (cfg.sheetUrl) document.getElementById('sheet-url').value = cfg.sheetUrl;
+  if (cfg.mep) document.getElementById('mep-rate').value = cfg.mep;
+}
+
+// ── FALLBACK DATA (posiciones hardcodeadas) ──────────────────
+const FALLBACK_IOL = [
+  { ticker:'TZXO6', nombre:'BONCER Oct 2026',         cantidad:73357,  precio_entrada:148.50,   grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
+  { ticker:'TZX26', nombre:'BONCER Jun 2026',          cantidad:5619,   precio_entrada:352.45,   grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
+  { ticker:'AL30',  nombre:'Bono Rep. Argentina USD',  cantidad:228,    precio_entrada:88003.16, grupo:'al30',   yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
+  { ticker:'SPY',   nombre:'CEDEAR S&P 500',           cantidad:4,      precio_entrada:51693.75, grupo:'tech',   yahoo_symbol:'SPY',   ratio:0.1,        accion:'sell',  label:'vender → Tasty' },
+  { ticker:'NVDA',  nombre:'CEDEAR Nvidia',            cantidad:10,     precio_entrada:11383,    grupo:'tech',   yahoo_symbol:'NVDA',  ratio:0.04166667, accion:'wait',  label:'esperar earnings' },
+  { ticker:'GOOGL', nombre:'CEDEAR Alphabet',          cantidad:11,     precio_entrada:8848.64,  grupo:'tech',   yahoo_symbol:'GOOGL', ratio:1,          accion:'wait',  label:'esperar rebote' },
+  { ticker:'XLE',   nombre:'CEDEAR Energy Select',     cantidad:2,      precio_entrada:42000,    grupo:'energy', yahoo_symbol:'XLE',   ratio:0.5,        accion:'hold',  label:'mantener' },
+  { ticker:'GGAL',  nombre:'Grupo Financiero Galicia', cantidad:1,      precio_entrada:6085,     grupo:'ar',     yahoo_symbol:'GGAL',  ratio:1,          accion:'hold',  label:'mantener' },
+  { ticker:'PAMP',  nombre:'Pampa Energía',            cantidad:27,     precio_entrada:0,        grupo:'energy', yahoo_symbol:'PAM',   ratio:1,          accion:'hold',  label:'hold (earnings 13/5)' },
+  { ticker:'TZXD7', nombre:'BONCER Dic 2027',          cantidad:0,      precio_entrada:0,        grupo:'cer',    yahoo_symbol:'',      ratio:1,          accion:'hold',  label:'mantener' },
+];
+
+const FALLBACK_TASTY = [
+  { ticker:'SPY',   nombre:'SPDR S&P 500 ETF',        cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
+  { ticker:'VWO',   nombre:'ETF Mercados Emergentes',  cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
+  { ticker:'EWZ',   nombre:'ETF Brasil',               cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
+  { ticker:'GLD',   nombre:'SPDR Gold Shares',         cantidad:0, precio_entrada_usd:0, accion:'comprar 1 abril' },
+  { ticker:'NVDA',  nombre:'Nvidia Corporation',       cantidad:0, precio_entrada_usd:0, accion:'migrar desde IOL' },
+  { ticker:'GOOGL', nombre:'Alphabet Inc.',            cantidad:0, precio_entrada_usd:0, accion:'migrar desde IOL' },
+  { ticker:'MELI',  nombre:'MercadoLibre',             cantidad:0, precio_entrada_usd:0, accion:'fraccionario' },
+];
+
+const FALLBACK_CRYPTO = [
+  { ticker:'BTC', nombre:'Bitcoin', cantidad:0.001002, precio_entrada_usd:80000, plataforma:'Binance' },
+];
+
+const STATIC_ARS = { TZXO6:148.80, TZX26:364.35, AL30:85860 };
+
+const GROUP_COLORS = { tech:'#1a56db', energy:'#00a854', al30:'#e67e00', cer:'#6741d9', ar:'#0891b2' };
+const GROUP_LABELS = { tech:'CEDEARs tech', energy:'Energía / LATAM', al30:'Bonos USD', cer:'CER / Inflación', ar:'Acciones AR' };
+
+let pricesUSD = {};
+let donutChart = null;
+let iolData = [], tastyData = [], cryptoData = [];
+let MEP = 1422;
+
+// ── FETCH PRICE ──────────────────────────────────────────────
+async function fetchPrice(symbol) {
+  const proxies = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`)}`,
+    `https://corsproxy.io/?${encodeURIComponent(`https://query2.finance.yahoo.com/v8/finance/chart/${symbol}`)}`,
+  ];
+  for (const url of proxies) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      const data = await res.json();
+      const p = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (p) return p;
+    } catch(e) {}
+  }
+  return null;
+}
+
+// ── FETCH SHEET ──────────────────────────────────────────────
+async function fetchSheet(url) {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    return await res.json();
+  } catch(e) {
+    return null;
+  }
+}
+
+// ── GET PRICE ARS ────────────────────────────────────────────
+function getPriceARS(pos) {
+  if (STATIC_ARS[pos.ticker]) return STATIC_ARS[pos.ticker];
+  const sym = pos.yahoo_symbol;
+  if (sym && pricesUSD[sym]) return pricesUSD[sym] * (parseFloat(pos.ratio)||1) * MEP;
+  return null;
+}
+
+function fmt(n, d=0) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return n.toLocaleString('es-AR', { minimumFractionDigits:d, maximumFractionDigits:d });
+}
+
+function fmtUSD(n, d=2) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return 'USD ' + n.toLocaleString('en-US', { minimumFractionDigits:d, maximumFractionDigits:d });
+}
+
+// ── RENDER IOL ───────────────────────────────────────────────
+function renderIOL() {
+  const tbody = document.getElementById('iol-tbody');
+  const groups = [
+    { label:'Bonos CER', key:'cer' },
+    { label:'Bono USD', key:'al30' },
+    { label:'CEDEARs tech — pendientes de migrar', key:'tech' },
+    { label:'Energía', key:'energy' },
+    { label:'Acciones argentinas', key:'ar' },
+  ];
+
+  let html = '';
+  let totalVal = 0, totalCost = 0;
+  const groupVals = {};
+
+  iolData.forEach(p => {
+    const price = getPriceARS(p);
+    const qty = parseFloat(p.cantidad) || 0;
+    const cost = parseFloat(p.precio_entrada) || 0;
+    const val = price ? price * qty : cost * qty;
+    totalVal += val;
+    totalCost += cost * qty;
+    groupVals[p.grupo] = (groupVals[p.grupo] || 0) + val;
+  });
+
+  groups.forEach(g => {
+    const items = iolData.filter(p => p.grupo === g.key);
+    if (!items.length) return;
+    html += `<tr class="section-row"><td colspan="6">${g.label}</td></tr>`;
+    items.forEach(p => {
+      const price = getPriceARS(p);
+      const qty = parseFloat(p.cantidad) || 0;
+      const cost = parseFloat(p.precio_entrada) || 0;
+      const val = price ? price * qty : cost * qty;
+      const pct = (price && cost) ? ((price - cost) / cost) * 100 : null;
+
+      const priceHtml = price
+        ? `<span class="price">$${fmt(price, price < 1000 ? 2 : 0)}</span>`
+        : `<span style="color:var(--text3);font-family:var(--mono)">—</span>`;
+
+      const pctHtml = pct !== null
+        ? `<span class="badge ${pct >= 0 ? 'bg' : 'br'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}%</span>`
+        : `<span class="badge bn">—</span>`;
+
+      const actionMap = { hold:'bb', wait:'ba', sell:'br' };
+      html += `<tr>
+        <td><div class="ticker">${p.ticker}</div><div class="ticker-name">${p.nombre}</div></td>
+        <td class="hide-sm" style="font-family:var(--mono)">${fmt(qty)}</td>
+        <td>${priceHtml}</td>
+        <td class="hide-sm" style="font-family:var(--mono)">$${fmt(val)}</td>
+        <td>${pctHtml}</td>
+        <td class="hide-sm"><span class="badge ${actionMap[p.accion]||'bn'}">${p.label}</span></td>
+      </tr>`;
+    });
+  });
+
+  tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Sin datos</td></tr>';
+
+  // KPIs
+  const pnl = totalVal - totalCost;
+  const pnlPct = totalCost ? (pnl / totalCost) * 100 : 0;
+  document.getElementById('kpi-iol').textContent = '$' + fmt(totalVal);
+  document.getElementById('kpi-iol-pnl').innerHTML =
+    `<span class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '▲' : '▼'} $${fmt(Math.abs(pnl))} (${Math.abs(pnlPct).toFixed(1)}%)</span>`;
+
+  // Donut
+  const order = ['tech','energy','al30','cer','ar'];
+  const data = order.map(k => groupVals[k] || 0);
+  const colors = order.map(k => GROUP_COLORS[k]);
+
+  document.getElementById('donut-total').textContent = '$' + fmt(totalVal);
+
+  if (donutChart) { donutChart.data.datasets[0].data = data; donutChart.update(); }
+  else {
+    donutChart = new Chart(document.getElementById('donutChart'), {
+      type: 'doughnut',
+      data: { datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverBorderWidth: 3 }] },
+      options: { cutout: '72%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` $${fmt(ctx.raw)}` } } } }
+    });
+  }
+
+  const listEl = document.getElementById('alloc-list');
+  listEl.innerHTML = order.map(k => {
+    const pct = totalVal ? ((groupVals[k]||0) / totalVal * 100) : 0;
+    return `<div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:${GROUP_COLORS[k]}"></div><span style="font-size:11px">${GROUP_LABELS[k]}</span></div>
+      <div class="alloc-pct">${pct.toFixed(0)}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER TASTYTRADE ────────────────────────────────────────
+function renderTasty() {
+  const tbody = document.getElementById('tasty-tbody');
+  tbody.innerHTML = tastyData.map(p => {
+    const price = p.yahoo_symbol && pricesUSD[p.yahoo_symbol] ? pricesUSD[p.yahoo_symbol] : null;
+    const qty = parseFloat(p.cantidad) || 0;
+    const cost = parseFloat(p.precio_entrada_usd) || 0;
+    const val = price ? price * qty : 0;
+    const pct = (price && cost) ? ((price - cost) / cost) * 100 : null;
+
+    const pctHtml = pct !== null
+      ? `<span class="badge ${pct >= 0 ? 'bg' : 'br'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}%</span>`
+      : `<span class="badge bn">—</span>`;
+
+    return `<tr>
+      <td><div class="ticker">${p.ticker}</div><div class="ticker-name">${p.nombre}</div></td>
+      <td style="text-align:left;color:var(--text2)">${p.accion || '—'}</td>
+      <td style="font-family:var(--mono)">${price ? 'USD ' + fmt(price, 2) : '—'}</td>
+      <td>${pctHtml}</td>
+      <td><span class="badge ${qty > 0 ? 'bg' : 'bp'}">${qty > 0 ? 'activa' : '1 abril'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── RENDER CRYPTO ────────────────────────────────────────────
+function renderCrypto() {
+  const tbody = document.getElementById('crypto-tbody');
+  let totalUSD = 0;
+
+  tbody.innerHTML = cryptoData.map(p => {
+    const qty = parseFloat(p.cantidad) || 0;
+    const cost = parseFloat(p.precio_entrada_usd) || 0;
+    const price = p.ticker === 'BTC' && pricesUSD['BTC-USD'] ? pricesUSD['BTC-USD'] : null;
+    const val = price ? price * qty : cost * qty;
+    totalUSD += val;
+
+    const pct = (price && cost) ? ((price - cost) / cost) * 100 : null;
+    const pctHtml = pct !== null
+      ? `<span class="badge ${pct >= 0 ? 'bg' : 'br'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}%</span>`
+      : `<span class="badge bn">—</span>`;
+
+    return `<tr>
+      <td><div class="ticker">${p.ticker}</div><div class="ticker-name">${p.nombre}</div></td>
+      <td style="font-family:var(--mono)">${qty.toFixed(6)}</td>
+      <td style="font-family:var(--mono)">${price ? 'USD ' + fmt(price, 0) : `USD ${fmt(cost, 0)} (entrada)`}</td>
+      <td style="font-family:var(--mono)">USD ${fmt(val, 2)}</td>
+      <td>${pctHtml}</td>
+      <td><span class="badge bc">${p.plataforma}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('kpi-btc').textContent = fmtUSD(totalUSD, 2);
+
+  const btcPos = cryptoData.find(p => p.ticker === 'BTC');
+  if (btcPos) {
+    const price = pricesUSD['BTC-USD'];
+    const cost = parseFloat(btcPos.precio_entrada_usd) || 0;
+    if (price && cost) {
+      const pct = ((price - cost) / cost) * 100;
+      document.getElementById('kpi-btc-pnl').innerHTML =
+        `<span class="${pct >= 0 ? 'up' : 'down'}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}% vs entrada</span>`;
+    }
+  }
+}
+
+// ── TAB SWITCHER ─────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── LOAD ALL ─────────────────────────────────────────────────
+async function loadAll() {
+  const btn = document.getElementById('refresh-btn');
+  const icon = document.getElementById('refresh-icon');
+  btn.classList.add('loading');
+  icon.classList.add('spin');
+
+  const cfg = getConfig();
+  MEP = cfg.mep || 1422;
+  document.getElementById('kpi-mep').textContent = '$' + fmt(MEP);
+
+  // Fetch Sheet si hay URL configurada
+  if (cfg.sheetUrl) {
+    const sheetData = await fetchSheet(cfg.sheetUrl);
+    if (sheetData) {
+      if (sheetData.iol?.length) iolData = sheetData.iol;
+      if (sheetData.tastytrade?.length) tastyData = sheetData.tastytrade;
+      if (sheetData.crypto?.length) cryptoData = sheetData.crypto;
+      if (sheetData.config?.mep) MEP = parseFloat(sheetData.config.mep) || MEP;
+    }
+  }
+
+  // Usar fallback si no hay Sheet
+  if (!iolData.length) iolData = FALLBACK_IOL;
+  if (!tastyData.length) tastyData = FALLBACK_TASTY;
+  if (!cryptoData.length) cryptoData = FALLBACK_CRYPTO;
+
+  // Fetch precios en vivo
+  const iolSymbols = [...new Set(iolData.filter(p => p.yahoo_symbol).map(p => p.yahoo_symbol))];
+  const tastySymbols = [...new Set(tastyData.filter(p => p.yahoo_symbol).map(p => p.yahoo_symbol))];
+  const allSymbols = [...new Set([...iolSymbols, ...tastySymbols, 'BTC-USD'])];
+
+  const results = await Promise.all(allSymbols.map(s => fetchPrice(s).then(p => ({s, p}))));
+  results.forEach(({s, p}) => { if (p) pricesUSD[s] = p; });
+
+  renderIOL();
+  renderTasty();
+  renderCrypto();
+
+  const now = new Date();
+  document.getElementById('last-update').textContent =
+    `Actualizado: ${now.toLocaleDateString('es-AR')} ${now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})}`;
+
+  btn.classList.remove('loading');
+  icon.classList.remove('spin');
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
